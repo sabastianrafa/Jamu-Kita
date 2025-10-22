@@ -53,10 +53,11 @@
   "devDependencies": {
     "chai": "^5.3.3",
     "chai-http": "^5.1.2",
+    "clone": "^2.1.2",
     "mocha": "^11.7.4",
+    "mocha-suppress-logs": "^0.5.1",
     "prisma": "^6.8.2",
-    "supertest": "^7.1.4",
-    "mocha-suppress-logs": "^0.5.0"
+    "supertest": "^7.1.4"
   },
   "type": "module"
 }
