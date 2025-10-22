@@ -20,7 +20,12 @@
     "start": "node src/server.js",
     "generate-jwt": "node generator/generateJWT.js",
     "dev": "node src/server.js --watch",
-    "test": "mocha"
+    "test": "NODE_ENV=test mocha",
+    "test:watch": "NODE_ENV=test mocha --watch",
+    "test:coverage": "NODE_ENV=test nyc mocha",
+    "test:ci": "node scripts/test.sh",
+    "test:sqlite": "DATABASE_URL=\"file::memory:?socket_timeout=10&connection_limit=1\" npm test",
+    "db:test:setup": "npx prisma db push --skip-generate --schema=./prisma/schema.test.prisma"
   },
   "prisma": {
     "seed": "node prisma/seed/seed.js"
@@ -46,10 +51,11 @@
   },
   "homepage": "https://github.com/yourusername/Jamu-Kita#readme",
   "devDependencies": {
-    "chai": "^5.2.0",
-    "mocha": "^11.5.0",
+    "chai": "^5.3.3",
+    "chai-http": "^5.1.2",
+    "mocha": "^11.7.4",
     "prisma": "^6.8.2",
-    "supertest": "^7.1.1"
+    "supertest": "^7.1.4"
   },
   "type": "module"
 }

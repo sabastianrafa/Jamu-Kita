@@ -1,5 +1,9 @@
 # Jamu Kita API
 
+![Tests](https://github.com/AthallahDzaki/Jamu-Kita/actions/workflows/test.yml/badge.svg)
+![Node.js](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen)
+![License](https://img.shields.io/badge/license-MIT-blue)
+
 **Jamu Kita** adalah sebuah REST API yang menyediakan platform untuk mengelola dan berbagi resep jamu tradisional Indonesia. API ini memungkinkan pengguna untuk mencari resep, memberikan komentar dan rating, serta menyimpan resep favorit mereka.
 
 ## 🌿 Fitur Utama
@@ -81,6 +85,21 @@ npm start
 
 Server akan berjalan di `http://localhost:3000`
 
+### 6. (Optional) Setup Testing
+```bash
+# Buat database test
+CREATE DATABASE jamukita_test;
+
+# Copy .env.test.example ke .env.test dan sesuaikan
+cp .env.test.example .env.test
+
+# Run migrations pada test database
+DATABASE_URL="mysql://user:password@localhost:3306/jamukita_test" npx prisma migrate dev
+
+# Jalankan tests
+npm test
+```
+
 ## 📚 Dokumentasi API
 
 Setelah server berjalan, akses dokumentasi lengkap di:
@@ -158,8 +177,54 @@ Authorization: Bearer <your_jwt_token>
 
 ## 🧪 Testing
 
+API ini dilengkapi dengan **73 unit tests** menggunakan Mocha, Chai, dan Supertest.
+
+### Test Coverage
+
+| Test Suite | Tests | Coverage |
+|------------|-------|----------|
+| Auth | 13 | Register, Login, Logout |
+| Resep | 20 | CRUD, Search, Filters |
+| Kategori | 3 | Get all categories |
+| Komentar | 11 | Create, Read, Validations |
+| Favorit | 13 | Add, Remove, List |
+| Admin | 13 | User & Resep management |
+| **TOTAL** | **73** | **All endpoints** |
+
+### Running Tests
+
 ```bash
+# Run all tests
 npm test
+
+# Run specific test file
+npx mocha tests/auth.test.js
+
+# Run in watch mode
+npm run test:watch
+```
+
+### Setup Test Environment
+
+1. Buat database test:
+```bash
+CREATE DATABASE jamukita_test;
+```
+
+2. Configure `.env.test`:
+```env
+DATABASE_URL="mysql://user:password@localhost:3306/jamukita_test"
+JWT_SECRET="test_secret"
+NODE_ENV=test
+```
+
+3. Run migrations:
+```bash
+DATABASE_URL="mysql://user:password@localhost:3306/jamukita_test" npx prisma migrate dev
+```
+
+📖 **Dokumentasi lengkap testing:** [TESTING.md](./TESTING.md)
+
 ```
 
 ## � Security
