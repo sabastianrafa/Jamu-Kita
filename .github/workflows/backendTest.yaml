@@ -26,8 +26,17 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       
-      - name: Install dependencies
-        run: npm i
+      - name: Install dependencies (use npm ci if package-lock exists, else npm install)
+        run: |
+          if [ -f package-lock.json ]; then
+            echo "package-lock.json found — running npm ci --include=dev"
+            npm ci --include=dev
+          else
+            echo "package-lock.json not found — running npm install --include=dev"
+            npm install --include=dev
+          fi
+        env:
+          NPM_CONFIG_PRODUCTION: "false"
       
       - name: Generate Prisma Client
         run: npx prisma generate

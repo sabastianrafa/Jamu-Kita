@@ -135,14 +135,7 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
-# npm package-lock files
-package-lock.json
-# pnpm lockfile
-pnpm-lock.yaml
-# yarn lockfile
-yarn.lock
-# Bun lockfile
-bun.lockb
+
 # Bun cache
 .bun
 
