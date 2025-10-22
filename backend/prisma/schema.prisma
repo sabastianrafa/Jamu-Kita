@@ -1,0 +1,85 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  nama      String
+  email     String    @unique
+  password  String
+  role      UserRole  @default(anggota)
+  createdAt DateTime  @default(now())
+  userToken String?   @db.Text
+  komentar  Komentar[]
+  favorit   Favorit[]
+
+  @@map("users")
+}
+
+model Kategori {
+  id     Int     @id @default(autoincrement())
+  nama   String  @unique
+  resep  Resep[]
+
+  @@map("kategori")
+}
+
+model Resep {
+  id                String     @id @default(uuid())
+  judul             String
+  deskripsi         String     @db.Text
+  gambarURL         String?
+  sumberLiteratur   String?    @db.Text
+  kategoriId        Int
+  bahan             String     @db.Text // JSON array stored as text
+  langkahPembuatan  String     @db.Text // JSON array stored as text
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+  kategori          Kategori   @relation(fields: [kategoriId], references: [id])
+  komentar          Komentar[]
+  favorit           Favorit[]
+
+  @@index([kategoriId])
+  @@map("resep")
+}
+
+model Komentar {
+  id             Int      @id @default(autoincrement())
+  resepId        String
+  userId         Int
+  isiKomentar    String   @db.Text
+  rating         Int      // 1-5
+  tanggalPosting DateTime @default(now())
+  resep          Resep    @relation(fields: [resepId], references: [id], onDelete: Cascade)
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([resepId])
+  @@index([userId])
+  @@map("komentar")
+}
+
+model Favorit {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  resepId   String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  resep     Resep    @relation(fields: [resepId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, resepId])
+  @@index([userId])
+  @@index([resepId])
+  @@map("favorit")
+}
+
+enum UserRole {
+  anggota
+  admin
+
+  @@map("user_role")
+}
