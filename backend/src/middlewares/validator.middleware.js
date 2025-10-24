@@ -20,7 +20,7 @@ export const validate = (schemas) => {
       if (error) {
         errors.push(...error.details.map((e) => e.message));
       } else {
-        req.query = value; // Set validated and default values
+        Object.assign(req.query, value);
       }
     }
 

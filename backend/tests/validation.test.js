@@ -214,7 +214,7 @@ describe("Validation & Security Tests", () => {
           .set("Authorization", `Bearer ${adminToken}`)
           .send({
             judul: `Test Resep ${rating}`,
-            deskripsi: "Test",
+            deskripsi: "Test Resep Dengan Deskripsi Panjang",
             kategoriId: testData.kategori1.id,
             bahan: ["Test"],
             langkahPembuatan: ["Test"],

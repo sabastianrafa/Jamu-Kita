@@ -20,11 +20,10 @@
     "start": "node src/server.js",
     "generate-jwt": "node generator/generateJWT.js",
     "dev": "node src/server.js --watch",
-    "test": "NODE_ENV=test mocha",
-    "test:watch": "NODE_ENV=test mocha --watch",
-    "test:coverage": "NODE_ENV=test nyc mocha",
-    "test:ci": "node scripts/test.sh",
-    "test:sqlite": "DATABASE_URL=\"file::memory:?socket_timeout=10&connection_limit=1\" npm test",
+    "test": "set NODE_ENV=test && mocha --require tests/setup.js",
+    "test:watch": "set NODE_ENV=test && mocha --watch --require ./tests/setup.js",
+    "test:coverage": "set NODE_ENV=test && nyc mocha --require ./tests/setup.js",
+    "test:sqlite": "set DATABASE_URL=file:./dev-test.db && npm run test:watch",
     "db:test:setup": "npx prisma db push --skip-generate --schema=./prisma/schema.test.prisma"
   },
   "prisma": {

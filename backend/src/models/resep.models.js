@@ -8,8 +8,12 @@ export const ResepModel = {
 
     if (q) {
       where.OR = [
-        { judul: { contains: q, mode: "insensitive" } },
-        { deskripsi: { contains: q, mode: "insensitive" } },
+        { judul: { contains: q, 
+                   //mode: "insensitive" 
+        } },
+        { deskripsi: { contains: q, 
+                       //mode: "insensitive" 
+        } },
       ];
     }
 
@@ -85,11 +89,21 @@ export const ResepModel = {
     // Search by keyword in multiple fields
     if (keyword) {
       where.OR = [
-        { judul: { contains: keyword, mode: "insensitive" } },
-        { deskripsi: { contains: keyword, mode: "insensitive" } },
-        { bahan: { contains: keyword, mode: "insensitive" } },
-        { langkahPembuatan: { contains: keyword, mode: "insensitive" } },
-        { sumberLiteratur: { contains: keyword, mode: "insensitive" } },
+        { judul: { contains: keyword, 
+                   //mode: "insensitive" 
+        } },
+        { deskripsi: { contains: keyword, 
+                       //mode: "insensitive" 
+        } },
+        { bahan: { contains: keyword, 
+                   //mode: "insensitive" 
+        } },
+        { langkahPembuatan: { contains: keyword, 
+                              //mode: "insensitive" 
+        } },
+        { sumberLiteratur: { contains: keyword, 
+                             //mode: "insensitive" 
+        } },
       ];
     }
 
@@ -197,8 +211,12 @@ export const ResepModel = {
 
     if (q) {
       where.OR = [
-        { judul: { contains: q, mode: "insensitive" } },
-        { deskripsi: { contains: q, mode: "insensitive" } },
+        { judul: { contains: q, 
+                   //mode: "insensitive" 
+        } },
+        { deskripsi: { contains: q, 
+                       //mode: "insensitive" 
+        } },
       ];
     }
 

@@ -25,7 +25,7 @@ export const AdminUserController = {
 
       // Prevent admin from deleting themselves
       if (parseInt(id) === currentUserId) {
-        throw new ResponseError(400, "Tidak dapat menghapus akun sendiri");
+        throw new ResponseError(403, "Tidak dapat menghapus akun sendiri");
       }
 
       // Check if user exists

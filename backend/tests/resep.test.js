@@ -60,7 +60,6 @@ describe("Resep API Tests", () => {
 
     it("should filter resep by keyword", async () => {
       const res = await request(app).get("/v1/resep?q=Beras");
-
       expect(res.status).to.equal(200);
       expect(res.body).to.have.property("success", true);
       expect(res.body.data).to.be.an("array");
@@ -104,14 +103,14 @@ describe("Resep API Tests", () => {
       );
 
       expect(res.status).to.equal(200);
-      expect(res.body.filters).to.have.property("kategoriId", testData.kategori1.id);
+      expect(res.body.filters).to.have.property("kategoriId", testData.kategori1.id.toString());
     });
 
     it("should filter by minRating", async () => {
       const res = await request(app).get("/v1/resep/search?minRating=4.0");
 
       expect(res.status).to.equal(200);
-      expect(res.body.filters).to.have.property("minRating", 4.0);
+      expect(res.body.filters).to.have.property("minRating", "4.0");
     });
 
     it("should sort by rating descending", async () => {

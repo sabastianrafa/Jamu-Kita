@@ -7,7 +7,12 @@ export const AuthController = {
   // POST /auth/register - Register new Anggota
   async register(req, res, next) {
     try {
-      const { nama, email, password } = req.body;
+      let { nama, email, password } = req.body;
+
+      // Trim input
+      nama = nama?.trim();
+      email = email?.trim().toLowerCase();
+      password = password?.trim();
 
       // Check if email already exists
       const emailExists = await UserModel.emailExists(email);
@@ -56,7 +61,8 @@ export const AuthController = {
   // POST /auth/login - Login for Anggota and Admin
   async login(req, res, next) {
     try {
-      const { email, password } = req.body;
+      let { email, password } = req.body;
+      email = email.toLowerCase();
 
       // Find user by email
       const user = await UserModel.getByEmail(email);

@@ -1,35 +1,51 @@
 import dotenv from "dotenv";
-import { PrismaClient } from "@prisma/client";
 import { execSync } from "child_process";
 import { existsSync, unlinkSync } from "fs";
 
 // Load test environment variables
 dotenv.config({ path: ".env.test" });
 
-// Check if using SQLite (for CI/CD)
-const isSQLite = process.env.DATABASE_URL?.includes("file:");
+console.log("Database URL : " + process.env.DATABASE_URL);
 
-// Initialize Prisma Client for testing
-export const prisma = new PrismaClient();
+const dbUrl = process.env.DATABASE_URL?.replace(/^"+|"+$/g, "");
+const isSQLite = dbUrl?.startsWith("file:");
+console.log("Database URL :", dbUrl);
+console.log("isSQLite ?", isSQLite);
+console.log('isSQLite ? ', isSQLite);
 
-// Setup database schema for SQLite
-export async function setupTestDatabase() {
-  if (isSQLite) {
+if (isSQLite) {
     try {
-      // Push schema to SQLite (no migration needed for in-memory)
-      execSync("npx prisma db push --skip-generate --schema=./prisma/schema.test.prisma", {
-        stdio: "ignore",
-        env: { ...process.env, DATABASE_URL: process.env.DATABASE_URL },
-      });
-    } catch (error) {
-      console.error("Failed to setup test database:", error.message);
+        // If you want a clean DB before each run, remove the file first
+        const match = process.env.DATABASE_URL.match(/^file:(.+)$/);
+        if (match && existsSync(match[1])) {
+            unlinkSync(match[1]);
+            console.log("Old test DB deleted.");
+        }
+    } catch (err) {
+        // Ignore if not exist
     }
-  }
+    try {
+        // Generate Prisma Client
+        execSync("npx prisma generate --schema=./prisma/schema.test.prisma", {
+            stdio: "inherit",
+            env: { ...process.env, DATABASE_URL: process.env.DATABASE_URL },
+        });
+
+        // Push schema to SQLite file DB
+        execSync("npx prisma db push --skip-generate --schema=./prisma/schema.test.prisma", {
+            stdio: "inherit",
+            env: { ...process.env, DATABASE_URL: process.env.DATABASE_URL },
+        });
+    } catch (err) {
+        console.error("Failed to setup test database:", err.message);
+    }
 }
 
-// Helper function to clean database before tests
+import { PrismaClient } from "@prisma/client";
+export const prisma = new PrismaClient();
+
+// Helper: clean, seed, close same as before
 export async function cleanDatabase() {
-  // Delete in order to respect foreign key constraints
   await prisma.komentar.deleteMany();
   await prisma.favorit.deleteMany();
   await prisma.resep.deleteMany();

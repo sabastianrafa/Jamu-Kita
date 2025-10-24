@@ -163,51 +163,57 @@ describe("Favorit API Tests", () => {
   });
 
   describe("DELETE /v1/favorit/:resep_id", () => {
-    it("should remove resep from favorit successfully", async () => {
-      // First add to favorit
-      await request(app)
-        .post("/v1/favorit")
-        .set("Authorization", `Bearer ${anotherUserToken}`)
-        .send({
-          resepId: testData.resep2.id,
-        });
-
-      // Then remove
-      const res = await request(app)
-        .delete(`/v1/favorit/${testData.resep2.id}`)
-        .set("Authorization", `Bearer ${anotherUserToken}`);
-
-      expect(res.status).to.equal(200);
-      expect(res.body).to.have.property("success", true);
-      expect(res.body.message).to.include("dihapus dari favorit");
-    });
-
-    it("should fail without authorization", async () => {
-      const res = await request(app).delete(`/v1/favorit/${testData.resep1.id}`);
-
-      expect(res.status).to.equal(401);
-      expect(res.body).to.have.property("success", false);
-    });
-
-    it("should fail for non-existent favorit", async () => {
-      const res = await request(app)
-        .delete(`/v1/favorit/${testData.resep2.id}`)
-        .set("Authorization", `Bearer ${anotherUserToken}`);
-
-      expect(res.status).to.equal(404);
-      expect(res.body).to.have.property("success", false);
-      expect(res.body.message).to.include("tidak ditemukan");
-    });
-
-    it("should not delete other user's favorit", async () => {
-      // userToken has resep1 in favorit
-      // Try to delete with anotherUserToken
-      const res = await request(app)
-        .delete(`/v1/favorit/${testData.resep1.id}`)
-        .set("Authorization", `Bearer ${anotherUserToken}`);
-
-      expect(res.status).to.equal(404);
-      expect(res.body).to.have.property("success", false);
+  beforeEach(async () => {
+    // Reset semua favorit
+    await prisma.favorit.deleteMany({});
+    
+    // Setup: Hanya userToken yang punya resep1 di favorit
+    await prisma.favorit.create({
+      data: {
+        userId: testData.anggota.id,  // ID dari userToken
+        resepId: testData.resep1.id,
+      },
     });
   });
+
+  it("should remove resep from favorit successfully", async () => {
+    // userToken delete favoritnya sendiri (BOLEH)
+    const res = await request(app)
+      .delete(`/v1/favorit/${testData.resep1.id}`)
+      .set("Authorization", `Bearer ${userToken}`);
+
+    expect(res.status).to.equal(200);
+    expect(res.body).to.have.property("success", true);
+    expect(res.body.message).to.include("dihapus dari favorit");
+  });
+
+  it("should fail without authorization", async () => {
+    const res = await request(app).delete(`/v1/favorit/${testData.resep1.id}`);
+
+    expect(res.status).to.equal(401);
+    expect(res.body).to.have.property("success", false);
+  });
+
+  it("should fail for non-existent favorit", async () => {
+    // anotherUserToken coba delete resep2 yang tidak ada di favoritnya
+    const res = await request(app)
+      .delete(`/v1/favorit/${testData.resep2.id}`)
+      .set("Authorization", `Bearer ${anotherUserToken}`);
+
+    expect(res.status).to.equal(404);
+    expect(res.body).to.have.property("success", false);
+    expect(res.body.message).to.include("Resep tidak ada di daftar favorit");
+  });
+
+  it("should not delete other user's favorit", async () => {
+    // anotherUserToken coba delete favorit resep1 milik userToken (TIDAK BOLEH)
+    const res = await request(app)
+      .delete(`/v1/favorit/${testData.resep1.id}`)
+      .set("Authorization", `Bearer ${anotherUserToken}`);
+
+    expect(res.status).to.equal(404);
+    expect(res.body).to.have.property("success", false);
+    expect(res.body.message).to.include("Resep tidak ada di daftar favorit");
+  });
+});
 });

@@ -164,7 +164,8 @@ describe("Admin API Tests", () => {
 
       expect(res.status).to.equal(403);
       expect(res.body).to.have.property("success", false);
-      expect(res.body.message).to.include("tidak dapat menghapus admin");
+      console.log(res.body);
+      expect(res.body.message).to.include("Tidak dapat menghapus akun admin lain");
     });
 
     it("should fail when admin tries to delete themselves", async () => {
@@ -174,7 +175,7 @@ describe("Admin API Tests", () => {
 
       expect(res.status).to.equal(403);
       expect(res.body).to.have.property("success", false);
-      expect(res.body.message).to.include("tidak dapat menghapus akun sendiri");
+      expect(res.body.message).to.include("Tidak dapat menghapus akun sendiri");
     });
   });
 

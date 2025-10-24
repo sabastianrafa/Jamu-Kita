@@ -79,16 +79,28 @@ export const AdminResepController = {
   // POST /admin/resep - Create new resep
   async create(req, res, next) {
     try {
-      const { kategoriId } = req.body;
+      const { kategoriId, judul, deskripsi, bahan, langkahPembuatan } = req.body;
 
       // Check if kategori exists
       const kategori = await KategoriModel.getById(kategoriId);
       if (!kategori) {
         throw new ResponseError(400, "Kategori tidak ditemukan");
       }
-
-      const resep = await ResepModel.create(req.body);
-
+    
+      // Sanitasi input
+      const cleanedJudul = judul?.trim();
+      const cleanedDeskripsi = deskripsi?.trim();
+      const cleanedBahan = Array.isArray(bahan) ? bahan.map((b) => b.trim()) : [];
+      const cleanedLangkahPembuatan = Array.isArray(langkahPembuatan) ? langkahPembuatan.map((l) => l.trim()) : [];
+    
+      const resep = await ResepModel.create({
+        ...req.body,
+        judul: cleanedJudul,
+        deskripsi: cleanedDeskripsi,
+        bahan: cleanedBahan,
+        langkahPembuatan: cleanedLangkahPembuatan,
+      });
+    
       res.status(201).json({
         success: true,
         message: "Resep berhasil ditambahkan",
@@ -101,6 +113,8 @@ export const AdminResepController = {
             id: resep.kategori.id,
             nama: resep.kategori.nama,
           },
+          bahan: JSON.parse(resep.bahan),
+          langkahPembuatan: JSON.parse(resep.langkahPembuatan)
         },
       });
     } catch (error) {
