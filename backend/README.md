@@ -1,6 +1,6 @@
 # Jamu Kita API
 
-![Tests](https://github.com/AthallahDzaki/Jamu-Kita/actions/workflows/test.yml/badge.svg)
+![Tests](https://github.com/AthallahDzaki/Jamu-Kita/actions/workflows/backendTest.yaml/badge.svg)
 ![Node.js](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 

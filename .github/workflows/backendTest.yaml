@@ -26,24 +26,24 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       
-      - name: Install dependencies (use npm ci if package-lock exists, else npm install)
+      - name: Install dependencies
         run: |
           if [ -f package-lock.json ]; then
-            echo "package-lock.json found — running npm ci --include=dev"
-            npm ci --include=dev --omit=dev
+            echo "package-lock.json found — running npm ci"
+            npm ci
           else
-            echo "package-lock.json not found — running npm install --include=dev"
-            npm install --include=dev --omit=dev
+            echo "package-lock.json not found — running npm install"
+            npm install
           fi
         env:
-          NPM_CONFIG_PRODUCTION: "false"
+          NODE_ENV: development
       
-      - name: Generate Prisma Client
-        run: npx prisma generate
+      - name: Generate Prisma Client for Test Schema
+        run: npx prisma generate --schema=./prisma/schema.test.prisma
       
-      - name: Setup test database (SQLite in-memory)
+      - name: Setup test environment
         run: |
-          echo "DATABASE_URL=file::memory:?socket_timeout=10&connection_limit=1" > .env.test
+          echo "DATABASE_URL=file:./test.db" > .env.test
           echo "JWT_SECRET=test_jwt_secret_for_ci" >> .env.test
           echo "PORT=3001" >> .env.test
           echo "NODE_ENV=test" >> .env.test
@@ -51,20 +51,24 @@ jobs:
       - name: Push database schema
         run: npx prisma db push --skip-generate --schema=./prisma/schema.test.prisma
         env:
-          DATABASE_URL: "file::memory:?socket_timeout=10&connection_limit=1"
+          DATABASE_URL: "file:./test.db"
       
       - name: Run tests
         run: npm test
         env:
-          DATABASE_URL: "file::memory:?socket_timeout=10&connection_limit=1"
+          DATABASE_URL: "file:./test.db"
           JWT_SECRET: test_jwt_secret_for_ci
           NODE_ENV: test
+      
+      - name: Cleanup test database
+        if: always()
+        run: rm -f test.db test.db-journal
       
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: test-results-${{ matrix.node-version }}
+          name: test-results-node-${{ matrix.node-version }}
           path: |
-            test-results/
-            coverage/
+            backend/test-results/
+            backend/coverage/
