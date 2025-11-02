@@ -2,12 +2,22 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
 
+  const pathname = usePathname();
+
+  // Jika pathname belum tersedia (rendering sementara), jangan render navbar
+  if (!pathname) return null;
+  const is404 = pathname === "/404" || pathname.includes("/404");
+  const isAuthRoute = pathname.toLowerCase() === "/login" || pathname.toLowerCase() === "/register" || pathname.toLowerCase().startsWith("/login") || pathname.toLowerCase().startsWith("/register");
+
+  if (is404 || isAuthRoute) return null;
+
   return (
-    <nav className="bg-yellow-100 fixed w-full z-50 shadow">
+    <nav className="top-0 z-50 h-16 bg-yellow-100 sticky w-full shadow">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
           {/* Logo */}
@@ -35,10 +45,10 @@ export default function Navbar() {
               Sejarah
             </Link>
             <Link
-              href="#produk"
+              href="/about-us"
               className="font-bold text-[#B6771D] hover:text-[#945d15]"
             >
-              Alami
+              Tentang Kami
             </Link>
             <Link
               href="/login"
@@ -97,16 +107,16 @@ export default function Navbar() {
             Sejarah
           </Link>
           <Link
-            href="#produk"
+            href="/about-us"
             className="block text-gray-800 hover:text-green-700 font-medium"
           >
-            Alami
+            Tentang Kami
           </Link>
           <Link
             href="/login"
             className="block bg-green-700 text-white text-center py-2 rounded-lg hover:bg-green-800 font-medium"
           >
-            Login
+            Sign In
           </Link>
         </div>
       )}
