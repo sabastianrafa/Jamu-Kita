@@ -25,12 +25,12 @@ export default function LoginPage() {
       <div className={`${styles.backdrop} pointer-events-none absolute inset-0 z-0`} aria-hidden>
         <div className={styles.radial} />
         <div className={styles.heroCenter}>
-          <div className={styles.heroWrap}>
+          <div>
             <Image
               src={ASSETS.hero}
               alt=""
               fill
-              className="object-cover"
+              className="object-cover opacity-60 blur-sm"
               sizes="100vw"
               priority
             />
@@ -170,7 +170,7 @@ export default function LoginPage() {
           {/* Sign up */}
           <p className="mt-4 text-center text-xs text-[#4e5c48] sm:text-sm">
             Don’t have an account?{" "}
-            <a href="#" className="font-semibold text-[#226d25] underline-offset-2 hover:underline">
+            <a href="/register" className="font-semibold text-[#226d25] underline-offset-2 hover:underline">
               Sign up
             </a>
           </p>
