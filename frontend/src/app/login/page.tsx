@@ -174,6 +174,15 @@ export default function LoginPage() {
               Sign up
             </a>
           </p>
+
+          {/* Admin Login */}
+<p className="mt-2 text-center text-xs text-[#4e5c48] sm:text-sm">
+  Login sebagai admin?{" "}
+  <a href="/loginadmin" className="font-semibold text-red-600 underline-offset-2 hover:underline">
+    Admin Panel
+  </a>
+</p>
+
         </form>
       </section>
     </main>

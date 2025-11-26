@@ -2,10 +2,10 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import styles from "./register.module.css";
+import styles from "./login.module.css";
 import { inter } from "@/app/fonts";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPerson, faEnvelope, faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
+import { faEnvelope, faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { faGoogle } from "@fortawesome/free-brands-svg-icons";
 
 const ASSETS = {
@@ -15,7 +15,7 @@ const ASSETS = {
   logo: "/images/jamu-logo.png",
 };
 
-export default function RegisterPage() {
+export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [remember, setRemember] = useState(false);
 
@@ -83,28 +83,13 @@ export default function RegisterPage() {
           </div>
         </div>
 
-        <h1 className="mb-5 text-center text-2xl font-bold text-[#4C763B] sm:mb-6 sm:text-3xl">Create Account</h1>
+        <h1 className="mb-5 text-center text-2xl font-bold text-[#4C763B] sm:mb-6 sm:text-3xl">Welcome Admin</h1>
 
         {/* Card form */}
         <form
           className="w-full max-w-md rounded-2xl bg-white/50 p-4 shadow-[0_10px_30px_rgba(0,0,0,0.08)] backdrop-blur-md sm:p-5"
           onSubmit={(e) => e.preventDefault()}
         >
-          {/* Username */}
-          <label className="mb-3 block">
-            <span className="sr-only">Email Address</span>
-            <div className="relative">
-              <input
-                type="input"
-                required
-                placeholder="Username"
-                className="h-11 w-full rounded-full border border-[#cde7cf] bg-white/90 px-4 pr-11 text-sm text-[#2f3e2a] placeholder:text-[#9fb19a] outline-none focus:border-[#66b37a] focus:ring-2 focus:ring-[#bfe6c9]"
-              />
-              <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#B6771D]">
-                <FontAwesomeIcon icon={faPerson} className="h-5 w-5" />
-              </span>
-            </div>
-          </label>
           {/* Email */}
           <label className="mb-3 block">
             <span className="sr-only">Email Address</span>
@@ -163,7 +148,7 @@ export default function RegisterPage() {
             type="submit"
             className="h-11 w-full rounded-full bg-[#4C763B] text-sm font-semibold text-white shadow-sm transition hover:brightness-110 active:brightness-95"
           >
-            Create Account
+            Login
           </button>
 
           {/* Divider */}
@@ -182,15 +167,15 @@ export default function RegisterPage() {
             <FontAwesomeIcon icon={faGoogle} className="h-5 w-5 text-[#ea4335]" />
           </button>
 
-          {/* Sign up */}
-          <p className="mt-4 text-center text-xs text-[#4e5c48] sm:text-sm">
-            Have an account?{" "}
-            <a href="/login" className="font-semibold text-[#226d25] underline-offset-2 hover:underline">
-              Sign in
-            </a>
-          </p>
 
-          
+            {/* Admin Login */}
+<p className="mt-2 text-center text-xs text-[#4e5c48] sm:text-sm">
+  Login sebagai User?{" "}
+  <a href="/login" className="font-semibold text-green-600 underline-offset-2 hover:underline">
+    User
+  </a>
+</p>
+
         </form>
       </section>
     </main>
