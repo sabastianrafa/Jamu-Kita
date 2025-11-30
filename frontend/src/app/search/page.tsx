@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import NavbarDashboard from "@/components/dashboard/Navbardashboard";
 import JamuCard from "@/components/dashboard/JamuCard";
 import { useSearchParams } from "next/navigation";
@@ -88,7 +88,7 @@ const jamuData = [
   },
 ];
 
-export default function SearchResultsPage() {
+function SearchContent() {
   const searchParams = useSearchParams();
   const query = searchParams.get("q") || "";
   const [results, setResults] = useState<typeof jamuData>([]);
@@ -101,32 +101,42 @@ export default function SearchResultsPage() {
   }, [query]);
 
   return (
+    <>
+      <h2 className="text-2xl font-bold mb-6">Hasil Pencarian: "{query}"</h2>
+
+      {results.length > 0 ? (
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {results.map((jamu) => (
+            <JamuCard
+              index={jamu.id}
+              key={jamu.id}
+              title={jamu.name}
+              img={jamu.image}
+              rating={jamu.rating}
+              benefits={jamu.benefits}
+              ingredients={jamu.ingredients}
+              steps={jamu.steps}
+            />
+          ))}
+        </div>
+      ) : (
+        <p className="text-center text-gray-500 mt-8">
+          Tidak ada jamu yang ditemukan untuk kata kunci "{query}".
+        </p>
+      )}
+    </>
+  );
+}
+
+export default function SearchResultsPage() {
+  return (
     <div className="min-h-screen bg-[#FFFBEA]">
       <NavbarDashboard />
 
       <div className="pt-32 px-8">
-        <h2 className="text-2xl font-bold mb-6">Hasil Pencarian: "{query}"</h2>
-
-        {results.length > 0 ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {results.map((jamu) => (
-              <JamuCard
-              index={jamu.id}
-                key={jamu.id}
-                title={jamu.name}
-                img={jamu.image}
-                rating={jamu.rating}
-                benefits={jamu.benefits}
-                ingredients={jamu.ingredients}
-                steps={jamu.steps}
-              />
-            ))}
-          </div>
-        ) : (
-          <p className="text-center text-gray-500 mt-8">
-            Tidak ada jamu yang ditemukan untuk kata kunci "{query}".
-          </p>
-        )}
+        <Suspense fallback={<div className="text-center p-8">Loading search results...</div>}>
+          <SearchContent />
+        </Suspense>
       </div>
     </div>
   );
