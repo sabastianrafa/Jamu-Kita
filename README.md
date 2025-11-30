@@ -2,17 +2,17 @@
 
 Platform digital untuk melestarikan dan berbagi warisan resep jamu tradisional Indonesia. 
 
-[![Live Demo](https://img.shields. io/badge/demo-live-success)](https://jamu-kita.vercel.app)
-![TypeScript](https://img.shields. io/badge/TypeScript-61. 3%25-blue)
+[![Live_Demo](https://img.shields.io/badge/demo-live-success)](https://jamu-kita.vercel.app)
+![Typescript](https://img.shields.io/badge/TypeScript-61.3%25-blue)
 ![JavaScript](https://img.shields.io/badge/JavaScript-36.9%25-yellow)
 ![Tests](https://github.com/AthallahDzaki/Jamu-Kita/actions/workflows/backendTest.yaml/badge.svg)
-![Node.js](https://img.shields.io/badge/node-%3E%3D18.0. 0-brightgreen)
+![Node Version](https://img.shields.io/badge/node-%3E%3D18.0.%200-brightgreen)
 
 ## 📖 Tentang Project
 
 **Jamu-Kita** adalah platform web full-stack yang memungkinkan pengguna untuk mencari, berbagi, dan mengelola resep jamu tradisional Indonesia. Platform ini menggabungkan kearifan lokal dengan teknologi modern untuk melestarikan warisan budaya Indonesia. 
 
-🌐 **Live Demo:** [https://jamu-kita. vercel.app](https://jamu-kita.vercel. app)
+🌐 **Live Demo:** [https://jamu-kita.vercel.app](https://jamu-kita.vercel.app)
 
 ## ✨ Fitur Utama
 
@@ -273,7 +273,7 @@ Agung
 ## 📞 Kontak
 
 - **Repository:** [github.com/AthallahDzaki/Jamu-Kita](https://github.com/AthallahDzaki/Jamu-Kita)
-- **Website:** [jamu-kita. vercel.app](https://jamu-kita.vercel. app)
+- **Website:** [jamu-kita.vercel.app](https://jamu-kita.vercel.app)
 
 ## 📄 License
 
