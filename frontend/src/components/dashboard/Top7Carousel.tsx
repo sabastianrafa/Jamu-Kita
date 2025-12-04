@@ -47,7 +47,7 @@ export default function Top7Carousel() {
   ];
 
   return (
-    <div className="overflow-x-auto pb-2 mt-4">
+    <div className="overflow-x-auto pb-2">
       <div className="flex gap-4 w-max">
         {data.map((item, i) => (
           <JamuCard

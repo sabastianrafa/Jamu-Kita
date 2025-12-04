@@ -88,12 +88,12 @@ export default function JamuCard({
     <>
       {/* CARD */}
       <div
-        className="w-36 bg-white rounded-xl border shadow hover:scale-105 transition relative cursor-pointer"
+        className="w-full bg-white rounded-xl border shadow hover:scale-105 transition relative cursor-pointer"
         onClick={() => setIsOpen(true)}
       >
-        <img src={img} className="h-32 w-full object-cover rounded-t-xl" alt={title} />
-        <div className="p-2">
-          <h3 className="text-sm font-semibold">{title}</h3>
+        <img src={img} className="h-32 sm:h-36 md:h-40 w-full object-cover rounded-t-xl" alt={title} />
+        <div className="p-2 sm:p-3">
+          <h3 className="text-xs sm:text-sm font-semibold truncate">{title}</h3>
           <p className="text-xs mt-1">⭐ {rating}/5</p>
         </div>
 

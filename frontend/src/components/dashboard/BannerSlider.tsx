@@ -14,13 +14,13 @@ export default function BannerSlider() {
   useEffect(() => {
     const interval = setInterval(() => {
       setIndex((prev) => (prev + 1) % slides.length);
-    }, 3000); // 3 detik
+    }, 3000);
 
     return () => clearInterval(interval);
   }, []);
 
   return (
-    <div className="relative w-full h-56 rounded-xl overflow-hidden shadow-lg mb-6">
+    <div className="relative w-full h-40 sm:h-48 md:h-56 lg:h-64 rounded-xl overflow-hidden shadow-lg mb-4 sm:mb-6">
       {/* Container untuk slide */}
       <div
         className="flex h-full w-full transition-transform duration-700 ease-in-out"
@@ -30,18 +30,18 @@ export default function BannerSlider() {
           <img
             key={i}
             src={src}
-            alt={`Slide ${i}`}
+            alt={`Slide ${i + 1}`}
             className="w-full h-full object-cover flex-shrink-0"
           />
         ))}
       </div>
 
       {/* Indikator bulatan */}
-      <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2">
+      <div className="absolute bottom-2 sm:bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 sm:gap-2">
         {slides.map((_, i) => (
           <div
             key={i}
-            className={`w-3 h-3 rounded-full transition-all duration-300 ${
+            className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full transition-all duration-300 ${
               index === i ? "bg-white" : "bg-white/40"
             }`}
           ></div>

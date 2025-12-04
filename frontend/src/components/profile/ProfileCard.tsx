@@ -18,22 +18,22 @@ export default function ProfileCard({ activeTab, setActiveTab }: ProfileCardProp
   };
 
   return (
-    <div className="w-full md:w-[350px] bg-white rounded-2xl shadow-lg p-6">
+    <div className="w-full md:w-[350px] bg-white rounded-2xl shadow-lg p-4 sm:p-6">
       <div className="flex flex-col items-center text-center">
         <Image
           src="/images/profile-photo.png"
           width={120}
           height={120}
-          className="rounded-full object-cover"
+          className="rounded-full object-cover w-20 h-20 sm:w-28 sm:h-28 md:w-[120px] md:h-[120px]"
           alt="User profile"
         />
 
-        <h2 className="text-2xl font-semibold mt-4">Irani Lutfiani Putri</h2>
+        <h2 className="text-lg sm:text-xl md:text-2xl font-semibold mt-3 sm:mt-4">Irani Lutfiani Putri</h2>
 
-        <div className="mt-6 w-full space-y-3">
+        <div className="mt-4 sm:mt-6 w-full space-y-2 sm:space-y-3">
           <button
             onClick={() => setActiveTab("saved")}
-            className={`w-full border border-green-700 rounded-xl py-3 font-medium transition ${
+            className={`w-full border border-green-700 rounded-xl py-2.5 sm:py-3 font-medium text-sm sm:text-base transition ${
               activeTab === "saved" ? "bg-green-700 text-white" : "hover:bg-green-50"
             }`}
           >
@@ -42,7 +42,7 @@ export default function ProfileCard({ activeTab, setActiveTab }: ProfileCardProp
 
           <button
             onClick={() => setActiveTab("reviews")}
-            className={`w-full border border-green-700 rounded-xl py-3 font-medium transition ${
+            className={`w-full border border-green-700 rounded-xl py-2.5 sm:py-3 font-medium text-sm sm:text-base transition ${
               activeTab === "reviews" ? "bg-green-700 text-white" : "hover:bg-green-50"
             }`}
           >
@@ -52,7 +52,7 @@ export default function ProfileCard({ activeTab, setActiveTab }: ProfileCardProp
           {/* Logout Button */}
           <button
             onClick={() => setIsConfirmOpen(true)}
-            className="w-full border border-red-500 text-red-500 rounded-xl py-3 font-medium hover:bg-red-50 transition"
+            className="w-full border border-red-500 text-red-500 rounded-xl py-2.5 sm:py-3 font-medium text-sm sm:text-base hover:bg-red-50 transition"
           >
             Logout
           </button>

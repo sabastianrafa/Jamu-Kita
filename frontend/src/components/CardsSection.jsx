@@ -57,19 +57,19 @@ export default function CardsSection() {
   ];
 
   return (
-    <section className="py-20">
-      <div className="max-w-7xl mx-auto px-8 space-y-12">
+    <section className="py-12 sm:py-16 md:py-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 sm:space-y-12">
 
         {/* TITLE */}
-        <div className="w-full mb-12 flex items-center">
+        <div className="w-full mb-8 sm:mb-12 flex items-center">
           <h2 
-            className="text-2xl md:text-3xl font-bold whitespace-nowrap"
+            className="text-xl sm:text-2xl md:text-3xl font-bold whitespace-nowrap"
             style={{ color: "#B6771D", fontFamily: "Inter" }}
           >
             Pilihan Jamu Kita
           </h2>
           <div 
-            className="ml-4 h-[2px] w-full" 
+            className="ml-3 sm:ml-4 h-[2px] w-full" 
             style={{ backgroundColor: "#B6771D" }}
           ></div>
         </div>
@@ -84,32 +84,29 @@ export default function CardsSection() {
               transition-all duration-700 transform
               ${visibleCards.includes(index) ? "opacity-100 translate-y-0" : "opacity-0 translate-y-20"}
               bg-gradient-to-r ${card.gradient}
-              rounded-3xl
+              rounded-2xl sm:rounded-3xl shadow-lg
             `}
             style={{ 
               transitionDelay: `${index * 150}ms`,
-              // Lebar card mengikuti alignment navbar
-              marginLeft: '-128px', // Sejajar dengan logo navbar
-              marginRight: '-300px', // Sejajar dengan tombol sign in
             }}
           >
-            <div className="px-10 md:px-14 lg:px-16 py-12">
+            <div className="px-4 sm:px-8 md:px-12 lg:px-16 py-8 sm:py-10 md:py-12">
               <div 
-                className={`grid grid-cols-1 md:grid-cols-2 gap-12 items-center 
+                className={`grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 md:gap-12 items-center 
                 ${card.position === "right" ? "direction-rtl" : ""}`}
               >
 
                 {/* TEXT */}
-                <div className={card.position === "right" ? "order-2" : "order-1"}>
+                <div className={`${card.position === "right" ? "md:order-2" : "md:order-1"} order-1`}>
                   <h2 
-                    className="text-4xl md:text-5xl font-bold text-[#B6771D] leading-tight" 
+                    className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-[#B6771D] leading-tight" 
                     style={{ fontFamily: "Inter" }}
                   >
                     {card.title}
                   </h2>
 
                   <p 
-                    className="mt-6 text-xl md:text-2xl text-gray-700 leading-relaxed"
+                    className="mt-4 sm:mt-6 text-base sm:text-lg md:text-xl lg:text-2xl text-gray-700 leading-relaxed"
                     style={{ fontFamily: "Inter" }}
                   >
                     {card.description}
@@ -117,13 +114,13 @@ export default function CardsSection() {
                 </div>
 
                 {/* IMAGE */}
-                <div className={card.position === "right" ? "order-1" : "order-2"}>
+                <div className={`${card.position === "right" ? "md:order-1" : "md:order-2"} order-2`}>
                   <div className="flex justify-center">
-                    <div className="w-64 h-64 bg-[#026301] rounded-full flex items-center justify-center shadow-xl">
+                    <div className="w-48 h-48 sm:w-56 sm:h-56 md:w-64 md:h-64 bg-[#026301] rounded-full flex items-center justify-center shadow-xl">
                       <img 
                         src={card.image}
                         alt={card.title}
-                        className="w-56 h-56 rounded-full object-cover"
+                        className="w-40 h-40 sm:w-48 sm:h-48 md:w-56 md:h-56 rounded-full object-cover"
                       />
                     </div>
                   </div>

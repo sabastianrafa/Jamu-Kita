@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, FormEvent } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
 import Image from "next/image";
 import styles from "./register.module.css";
 import { inter } from "@/app/fonts";
@@ -18,6 +20,33 @@ const ASSETS = {
 export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [remember, setRemember] = useState(false);
+  const [nama, setNama] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const { register } = useAuth();
+  const router = useRouter();
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setIsLoading(true);
+
+    try {
+      const result = await register({ nama, email, password });
+
+      if (result.success) {
+        router.push("/beranda-login");
+      } else {
+        setError(result.message);
+      }
+    } catch (err) {
+      setError("Terjadi kesalahan saat registrasi");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <main className="relative min-h-dvh w-full overflow-hidden bg-[#faf5d9]">
@@ -85,20 +114,29 @@ export default function RegisterPage() {
 
         <h1 className="mb-5 text-center text-2xl font-bold text-[#4C763B] sm:mb-6 sm:text-3xl">Create Account</h1>
 
+        {error && (
+          <div className="mb-4 w-full max-w-md rounded-lg bg-red-50 border border-red-200 p-3 text-center text-sm text-red-700">
+            {error}
+          </div>
+        )}
+
         {/* Card form */}
         <form
           className="w-full max-w-md rounded-2xl bg-white/50 p-4 shadow-[0_10px_30px_rgba(0,0,0,0.08)] backdrop-blur-md sm:p-5"
-          onSubmit={(e) => e.preventDefault()}
+          onSubmit={handleSubmit}
         >
           {/* Username */}
           <label className="mb-3 block">
-            <span className="sr-only">Email Address</span>
+            <span className="sr-only">Name</span>
             <div className="relative">
               <input
-                type="input"
+                type="text"
                 required
-                placeholder="Username"
-                className="h-11 w-full rounded-full border border-[#cde7cf] bg-white/90 px-4 pr-11 text-sm text-[#2f3e2a] placeholder:text-[#9fb19a] outline-none focus:border-[#66b37a] focus:ring-2 focus:ring-[#bfe6c9]"
+                placeholder="Name"
+                value={nama}
+                onChange={(e) => setNama(e.target.value)}
+                disabled={isLoading}
+                className="h-11 w-full rounded-full border border-[#cde7cf] bg-white/90 px-4 pr-11 text-sm text-[#2f3e2a] placeholder:text-[#9fb19a] outline-none focus:border-[#66b37a] focus:ring-2 focus:ring-[#bfe6c9] disabled:opacity-50"
               />
               <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#B6771D]">
                 <FontAwesomeIcon icon={faPerson} className="h-5 w-5" />
@@ -113,7 +151,10 @@ export default function RegisterPage() {
                 type="email"
                 required
                 placeholder="Email Address"
-                className="h-11 w-full rounded-full border border-[#cde7cf] bg-white/90 px-4 pr-11 text-sm text-[#2f3e2a] placeholder:text-[#9fb19a] outline-none focus:border-[#66b37a] focus:ring-2 focus:ring-[#bfe6c9]"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={isLoading}
+                className="h-11 w-full rounded-full border border-[#cde7cf] bg-white/90 px-4 pr-11 text-sm text-[#2f3e2a] placeholder:text-[#9fb19a] outline-none focus:border-[#66b37a] focus:ring-2 focus:ring-[#bfe6c9] disabled:opacity-50"
               />
               <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#B6771D]">
                 <FontAwesomeIcon icon={faEnvelope} className="h-5 w-5" />
@@ -129,7 +170,10 @@ export default function RegisterPage() {
                 type={showPassword ? "text" : "password"}
                 required
                 placeholder="Password"
-                className="h-11 w-full rounded-full border border-[#cde7cf] bg-white/90 px-4 pr-11 text-sm text-[#2f3e2a] placeholder:text-[#9fb19a] outline-none focus:border-[#66b37a] focus:ring-2 focus:ring-[#bfe6c9]"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                disabled={isLoading}
+                className="h-11 w-full rounded-full border border-[#cde7cf] bg-white/90 px-4 pr-11 text-sm text-[#2f3e2a] placeholder:text-[#9fb19a] outline-none focus:border-[#66b37a] focus:ring-2 focus:ring-[#bfe6c9] disabled:opacity-50"
               />
               <button
                 type="button"
@@ -158,12 +202,13 @@ export default function RegisterPage() {
             </a>
           </div>
 
-          {/* Login */}
+          {/* Create Account */}
           <button
             type="submit"
-            className="h-11 w-full rounded-full bg-[#4C763B] text-sm font-semibold text-white shadow-sm transition hover:brightness-110 active:brightness-95"
+            disabled={isLoading}
+            className="h-11 w-full rounded-full bg-[#4C763B] text-sm font-semibold text-white shadow-sm transition hover:brightness-110 active:brightness-95 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Create Account
+            {isLoading ? "Loading..." : "Create Account"}
           </button>
 
           {/* Divider */}

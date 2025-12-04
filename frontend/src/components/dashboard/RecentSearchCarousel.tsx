@@ -44,9 +44,9 @@ export default function Recent() {
   ];
 
   return (
-    <div className="overflow-x-auto pb-2 mt-4">
+    <div className="overflow-x-auto pb-2 mt-2 sm:mt-3">
       {/* Title */}
-      <h3 className="text-xl font-bold mb-3">🔍 Recent Pencarian Anda</h3>
+      <h3 className="text-lg sm:text-xl font-bold mb-3">🔍 Recent Pencarian Anda</h3>
 
       <div className="flex gap-4 w-max">
         {recentSearch.map((item, i) => (

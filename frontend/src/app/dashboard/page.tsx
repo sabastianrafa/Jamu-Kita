@@ -1,12 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import NavbarDashboard from "@/components/dashboard/Navbardashboard";
+import Navbar from "@/components/Navbar";
 import CategoryCarousel from "@/components/dashboard/CategoryCarousel";
 import Recent from "@/components/dashboard/RecentSearchCarousel";
 import Top7Carousel from "@/components/dashboard/Top7Carousel";
 import BannerSlider from "@/components/dashboard/BannerSlider";
 import JamuCard from "@/components/dashboard/JamuCard";
+import { useAuth } from "@/context/AuthContext";
 
 // Data jamu lengkap
 const jamuData: Record<
@@ -112,39 +113,61 @@ const jamuData: Record<
 
 export default function DashboardPage() {
   const [selectedCategory, setSelectedCategory] = useState("Kesehatan");
+  const [showCategories, setShowCategories] = useState(false);
+  const { isAuthenticated } = useAuth();
 
   return (
     <div className="min-h-screen bg-[#FFFBEA]">
-      {/* Navbar */}
-      <NavbarDashboard />
 
       {/* Content Wrapper */}
-      <div className="pt-32 px-8 flex gap-8">
-        {/* LEFT: Category Carousel */}
-        <div className="w-64 mt-2">
-          <CategoryCarousel onSelect={(cat) => setSelectedCategory(cat)} />
+      <div className="pt-24 sm:pt-28 md:pt-32 px-4 sm:px-6 md:px-8 flex flex-col md:flex-row gap-4 md:gap-8">
+        {/* Mobile Category Toggle Button */}
+        <div className="md:hidden mb-4">
+          <button
+            onClick={() => setShowCategories(!showCategories)}
+            className="w-full bg-[#B6771D] text-white px-4 py-3 rounded-lg font-semibold flex items-center justify-between"
+          >
+            <span>Kategori: {selectedCategory}</span>
+            <svg
+              className={`w-5 h-5 transition-transform ${showCategories ? 'rotate-180' : ''}`}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+        </div>
+
+        {/* LEFT: Category Carousel - Desktop always show, Mobile conditional */}
+        <div className={`${showCategories ? 'block' : 'hidden'} md:block w-full md:w-56 lg:w-64 mt-2`}>
+          <CategoryCarousel onSelect={(cat) => {
+            setSelectedCategory(cat);
+            setShowCategories(false);
+          }} />
         </div>
 
         {/* RIGHT: Main Content */}
-        <div className="flex-1">
+        <div className="flex-1 min-w-0">
           {/* Banner Slide */}
           <BannerSlider />
 
-<Recent />
+          {/* Recent - Hanya tampil jika sudah login */}
+          {isAuthenticated && <Recent />}
 
           {/* Top 7 Jamu */}
-          <h2 className="text-xl font-bold mb-4 mt-8">Top 7 Jamu Populer</h2>
+          <h2 className="text-lg sm:text-xl font-bold mb-4 mt-4 sm:mt-5">Top 7 Jamu Populer</h2>
           <Top7Carousel />
 
           {/* Section Jamu Berdasarkan Kategori */}
-          <div className="mt-10 pb-10">
-            <h2 className="text-xl font-bold mb-4">Jamu Kategori: {selectedCategory}</h2>
+          <div className="mt-6 sm:mt-8 pb-8 sm:pb-10">
+            <h2 className="text-lg sm:text-xl font-bold mb-4">Jamu Kategori: {selectedCategory}</h2>
 
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
               {jamuData[selectedCategory]?.length > 0 ? (
                 jamuData[selectedCategory].map((jamu) => (
                   <JamuCard
-                  index={jamu.id} 
+                    index={jamu.id} 
                     key={jamu.id}
                     title={jamu.name}
                     img={jamu.image}
