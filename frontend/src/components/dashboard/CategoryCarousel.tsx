@@ -4,7 +4,7 @@ import { useState } from "react";
 import {
   Leaf,
   HeartPulse,
-  Users,
+  LucideHouse,
   Apple,
   Sprout,
   Flower,
@@ -14,16 +14,17 @@ import {
 
 const categories = [
   { id: 1, name: "Kesehatan", icon: HeartPulse },
-  { id: 2, name: "Keluarga", icon: Users },
-  { id: 3, name: "Buah", icon: Apple },
+  { id: 2, name: "Manfaat", icon: Sprout },
+  { id: 3, name: "Rumahan", icon: LucideHouse },
   { id: 4, name: "Rempah", icon: CookingPot },
-  { id: 5, name: "Daun", icon: Leaf },
-  { id: 6, name: "Akar", icon: Sprout },
-  { id: 7, name: "Bunga", icon: Flower },
-  { id: 8, name: "Minuman", icon: CupSoda },
+  { id: 5, name: "Buah", icon: Apple },
 ];
 
-export default function CategoryCarousel({ onSelect }: { onSelect?: (cat: string) => void }) {
+export default function CategoryCarousel({
+  onSelect,
+}: {
+  onSelect?: (cat: string) => void;
+}) {
   const [active, setActive] = useState("Kesehatan");
 
   const handleSelect = (name: string) => {
@@ -33,14 +34,11 @@ export default function CategoryCarousel({ onSelect }: { onSelect?: (cat: string
 
   return (
     <div className="w-60 sticky top-24">
-
       {/* BOX WRAPPER */}
       <div className="bg-white rounded-2xl shadow-lg border p-5">
-
         <h2 className="text-lg font-bold mb-4">Kategori</h2>
 
         <div className="flex flex-col gap-3 overflow-y-auto max-h-[65vh] pr-2">
-
           {categories.map((cat) => {
             const Icon = cat.icon;
 
@@ -60,14 +58,15 @@ export default function CategoryCarousel({ onSelect }: { onSelect?: (cat: string
               >
                 <Icon
                   size={20}
-                  className={active === cat.name ? "text-white" : "text-green-700"}
+                  className={
+                    active === cat.name ? "text-white" : "text-green-700"
+                  }
                 />
                 <span className="font-medium">{cat.name}</span>
               </button>
             );
           })}
         </div>
-
       </div>
       {/* END BOX */}
     </div>

@@ -1,6 +1,5 @@
 "use client";
 
-import NavbarDashboard from "@/components/dashboard/Navbardashboard";
 import SejarahContent from "@/components/sejarah/SejarahContent";
 import BlogSidebar from "@/components/sejarah/BlogSidebar"; // Top News + Search Sidebar
 
@@ -8,8 +7,6 @@ import BlogSidebar from "@/components/sejarah/BlogSidebar"; // Top News + Search
 export default function SejarahPage() {
   return (
     <div className="min-h-screen bg-[#FFFBEA]">
-
-      <NavbarDashboard />
 
       {/* Layout utama */}
       <div className="pt-24 px-8 flex flex-col md:flex-row gap-10">

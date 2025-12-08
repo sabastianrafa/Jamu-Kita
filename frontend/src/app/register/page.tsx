@@ -37,7 +37,7 @@ export default function RegisterPage() {
       const result = await register({ nama, email, password });
 
       if (result.success) {
-        router.push("/beranda-login");
+        router.push("/beranda");
       } else {
         setError(result.message);
       }

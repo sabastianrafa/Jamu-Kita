@@ -1,22 +1,25 @@
 "use client";
 
-import Image from "next/image";
+import { ActivityCommentsItem } from "@/lib/api";
 
-export default function ReviewsList() {
+interface ReviewsListProps {
+  comments: ActivityCommentsItem[];
+}
+
+export default function ReviewsList({ comments }: ReviewsListProps) {
   return (
     <div className="bg-white p-6 rounded-2xl shadow-md">
       <h2 className="text-xl font-semibold mb-4">Ulasan</h2>
 
       <div className="space-y-4">
-        <div className="p-4 border rounded-xl hover:bg-green-50">
-          <p className="font-medium">Kunyit Asam – "Sangat bermanfaat!"</p>
-          <p className="text-sm opacity-60">Dibaca 2 hari lalu</p>
-        </div>
-
-        <div className="p-4 border rounded-xl hover:bg-green-50">
-          <p className="font-medium">Beras Kencur – "Rasa enak dan segar"</p>
-          <p className="text-sm opacity-60">Disimpan 4 hari lalu</p>
-        </div>
+        {comments.length === 0 && <p className="text-sm text-gray-600">Belum ada ulasan.</p>}
+        {comments.map((item) => (
+          <div key={item.id} className="p-4 border rounded-xl hover:bg-green-50">
+            <p className="font-medium">{item.judul} – "{item.isiKomentar}"</p>
+            <p className="text-xs text-gray-500">Rating: {item.rating}/5</p>
+            <p className="text-sm opacity-60">{new Date(item.tanggalPosting).toLocaleDateString()}</p>
+          </div>
+        ))}
       </div>
     </div>
   );

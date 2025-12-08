@@ -9,7 +9,6 @@ import Footer from "@/components/Footer";
 export default function AboutPage() {
   return (
     <main className="w-full min-h-screen bg-[#FAF8F1]">
-      <Navbar />
       <AboutHero />
       <HistorySection />
       <VisionMission />

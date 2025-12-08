@@ -24,7 +24,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const { login } = useAuth();
+  const { login, isAuthenticated } = useAuth();
   const router = useRouter();
 
   const handleSubmit = async (e: FormEvent) => {
@@ -36,7 +36,7 @@ export default function LoginPage() {
       const result = await login({ email, password });
 
       if (result.success) {
-        router.push("/beranda-login");
+        router.push("/beranda");
       } else {
         setError(result.message);
       }

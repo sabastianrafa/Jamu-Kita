@@ -11,6 +11,7 @@ interface AuthContextType {
   register: (data: RegisterData) => Promise<{ success: boolean; message: string }>;
   login: (data: LoginData) => Promise<{ success: boolean; message: string }>;
   logout: () => Promise<void>;
+  refreshProfile: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -18,24 +19,63 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
-    const token = apiService.getStoredToken();
-    if (token) {
-      try {
-        const payload = JSON.parse(atob(token.split(".")[1]));
-        if (payload.exp * 1000 > Date.now()) {
-          setUser(payload.user || null);
-        } else {
+    const initAuth = async () => {
+      const token = apiService.getStoredToken();
+      const storedUser = apiService.getStoredUser();
+      
+      if (token && storedUser) {
+        try {
+          const payload = JSON.parse(atob(token.split(".")[1]));
+          if (payload.exp * 1000 > Date.now()) {
+            // Sync profile with backend
+            const profile = await apiService.getProfile();
+            if (profile.success && profile.data) {
+              setUser(profile.data);
+              localStorage.setItem("user_data", JSON.stringify(profile.data));
+              setIsAuthenticated(true);
+              console.log("[AuthContext] User authenticated on init:", profile.data.email);
+            } else {
+              apiService.clearToken();
+              setUser(null);
+              setIsAuthenticated(false);
+            }
+          } else {
+            console.log("[AuthContext] Token expired");
+            apiService.clearToken();
+            setUser(null);
+            setIsAuthenticated(false);
+          }
+        } catch (error) {
+          console.error("[AuthContext] Token parsing error:", error);
           apiService.clearToken();
+          setUser(null);
+          setIsAuthenticated(false);
         }
-      } catch (error) {
-        apiService.clearToken();
+      } else {
+        console.log("[AuthContext] No token or user data found");
+        apiService.clearToken(); // Clear any orphaned data
+        setUser(null);
+        setIsAuthenticated(false);
       }
-    }
-    setIsLoading(false);
+      setIsLoading(false);
+    };
+
+    initAuth();
   }, []);
+
+  // Monitor authentication state changes
+  useEffect(() => {
+    console.log("[AuthContext] Auth state changed:", {
+      isAuthenticated,
+      hasUser: !!user,
+      userEmail: user?.email,
+      isLoading
+    });
+  }, [isAuthenticated, user, isLoading]);
 
   const register = async (
     data: RegisterData
@@ -43,8 +83,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const response = await apiService.register(data);
 
-      if (response.success && response.data?.user) {
+      if (response.success && response.data?.user && response.data?.access_token) {
         setUser(response.data.user);
+        setIsAuthenticated(true);
+        // Force a small delay to ensure state propagates
+        await new Promise(resolve => setTimeout(resolve, 50));
         return { success: true, message: response.message };
       }
 
@@ -53,6 +96,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         message: response.message || "Registrasi gagal",
       };
     } catch (error) {
+      console.error("Register error:", error);
       return {
         success: false,
         message: "Terjadi kesalahan saat registrasi",
@@ -65,9 +109,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   ): Promise<{ success: boolean; message: string }> => {
     try {
       const response = await apiService.login(data);
+      console.log("[AuthContext] Login response:", response);
 
-      if (response.success && response.data?.user) {
+      if (response.success && response.data?.user && response.data?.access_token) {
+        console.log("[AuthContext] Setting user:", response.data.user);
         setUser(response.data.user);
+        setIsAuthenticated(true);
+        // Force a small delay to ensure state propagates
+        await new Promise(resolve => setTimeout(resolve, 50));
         return { success: true, message: response.message };
       }
 
@@ -76,6 +125,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         message: response.message || "Login gagal",
       };
     } catch (error) {
+      console.error("[AuthContext] Login error:", error);
       return {
         success: false,
         message: "Terjadi kesalahan saat login",
@@ -90,8 +140,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.error("Logout error:", error);
     } finally {
       setUser(null);
+      setIsAuthenticated(false);
       apiService.clearToken();
       router.push("/login");
+    }
+  };
+
+  const refreshProfile = async () => {
+    try {
+      const profile = await apiService.getProfile();
+      if (profile.success && profile.data) {
+        setUser(profile.data);
+        setIsAuthenticated(true);
+        if (typeof window !== "undefined") {
+          localStorage.setItem("user_data", JSON.stringify(profile.data));
+        }
+      }
+    } catch (error) {
+      console.error("[AuthContext] refreshProfile error:", error);
     }
   };
 
@@ -100,10 +166,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       value={{
         user,
         isLoading,
-        isAuthenticated: !!user,
+        isAuthenticated,
         register,
         login,
         logout,
+        refreshProfile,
       }}
     >
       {children}

@@ -2,33 +2,17 @@
 
 import Image from "next/image";
 import { useState } from "react";
+import { Resep } from "@/lib/api";
 
-interface Jamu {
-  title: string;
-  image: string;
-  description: string;
+interface SavedListProps {
+  favorites: Resep[];
 }
 
-export default function SavedList() {
+export default function SavedList({ favorites }: SavedListProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [activeJamu, setActiveJamu] = useState<Jamu | null>(null);
+  const [activeJamu, setActiveJamu] = useState<Resep | null>(null);
 
-  const savedJamu: Jamu[] = [
-    {
-      title: "Kunyit Asam",
-      image: "/images/jamu1.jpg",
-      description:
-        "Kunyit Asam adalah jamu tradisional yang membantu menjaga kesehatan, melancarkan peredaran darah, dan meningkatkan daya tahan tubuh.",
-    },
-    {
-      title: "Beras Kencur",
-      image: "/images/jamu2.jpg",
-      description:
-        "Beras Kencur merupakan jamu yang membantu meningkatkan stamina, menjaga vitalitas, dan cocok dikonsumsi sehari-hari.",
-    },
-  ];
-
-  const openPopup = (jamu: Jamu) => {
+  const openPopup = (jamu: Resep) => {
     setActiveJamu(jamu);
     setIsOpen(true);
   };
@@ -38,20 +22,26 @@ export default function SavedList() {
       <h2 className="text-xl font-semibold mb-4">Tersimpan</h2>
 
       <div className="space-y-4">
-        {savedJamu.map((jamu, idx) => (
+        {favorites.length === 0 && (
+          <p className="text-sm text-gray-600">Belum ada resep tersimpan.</p>
+        )}
+        {favorites.map((jamu) => (
           <div
-            key={idx}
+            key={jamu.id}
             className="flex items-center gap-4 p-3 border rounded-xl hover:bg-green-50 cursor-pointer"
             onClick={() => openPopup(jamu)}
           >
             <Image
-              src={jamu.image}
+              src={jamu.gambarURL || "/images/jamu1.jpg"}
               width={60}
               height={60}
               className="rounded-lg object-cover"
-              alt={jamu.title}
+              alt={jamu.judul}
             />
-            <p className="font-medium">{jamu.title}</p>
+            <div>
+              <p className="font-medium">{jamu.judul}</p>
+              <p className="text-xs text-gray-500">{jamu.kategori?.nama}</p>
+            </div>
           </div>
         ))}
       </div>
@@ -66,15 +56,16 @@ export default function SavedList() {
             >
               &times;
             </button>
-            <h2 className="text-2xl font-bold mb-4">{activeJamu.title}</h2>
+            <h2 className="text-2xl font-bold mb-4">{activeJamu.judul}</h2>
             <Image
-              src={activeJamu.image}
+              src={activeJamu.gambarURL || "/images/jamu1.jpg"}
               width={500}
               height={250}
               className="w-full h-64 object-cover rounded-lg mb-4"
-              alt={activeJamu.title}
+              alt={activeJamu.judul}
             />
-            <p className="text-lg leading-8">{activeJamu.description}</p>
+            <p className="text-sm text-gray-600">{activeJamu.kategori?.nama}</p>
+            <p className="text-lg leading-8 mt-3">{activeJamu.deskripsi}</p>
           </div>
         </div>
       )}

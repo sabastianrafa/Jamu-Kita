@@ -1,10 +1,35 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { apiService } from "@/lib/api";
+import { User } from "@/lib/api";
 
-export default function AccountSettings() {
-  const [name, setName] = useState("Irani Lutfiani Putri");
-  const [email, setEmail] = useState("irani@example.com");
+interface AccountSettingsProps {
+  user: User | null;
+}
+
+export default function AccountSettings({ user, onProfileUpdate }: AccountSettingsProps & { onProfileUpdate: () => void }) {
+  const [name, setName] = useState(user?.nama || "Irani");
+  const [email, setEmail] = useState(user?.email || "");
+
+  useEffect(() => {
+    setName(user?.nama || "Irani");
+    setEmail(user?.email || "");
+  }, [user]);
+
+  const handleSubmit = () => {
+    apiService.updateProfile({ nama: name, email }).then((res) => {
+      if (res.success) {
+        alert("Profil berhasil diperbarui");
+        onProfileUpdate();
+      } else {
+        alert("Gagal memperbarui profil: " + res.message);
+      }
+    }).catch((err) => {
+      console.error("Error updating profile:", err);
+      alert("Terjadi kesalahan saat memperbarui profil");
+    });
+  }
 
   return (
      <div className="w-full bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all">
@@ -29,7 +54,7 @@ export default function AccountSettings() {
           />
         </div>
 
-        <button className="px-8 py-3 bg-green-700 text-white rounded-xl hover:scale-[1.05] transition font-semibold">
+        <button className="px-8 py-3 bg-green-700 text-white rounded-xl hover:scale-[1.05] transition font-semibold" onClick={handleSubmit}>
           Simpan Perubahan
         </button>
       </div>

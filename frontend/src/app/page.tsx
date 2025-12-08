@@ -47,7 +47,7 @@ export default function Home() {
               </p>
 
               <Link
-                href="#pilihan"
+                href="/beranda"
                 aria-label="Mulai jelajah pilihan jamu"
                 className="inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-medium shadow-[inset_0_-2px_0_rgba(0,0,0,0.1),0_6px_14px_rgba(0,0,0,0.08)] bg-[#FBE3A1] hover:bg-[#F7D778] transition-colors border border-[#F4D67E] text-[#5A43114] w-fit"
               >

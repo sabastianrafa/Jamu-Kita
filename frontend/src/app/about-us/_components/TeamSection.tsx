@@ -2,10 +2,10 @@
 
 export default function TeamSection() {
   const team = [
-    { name: "Irani Lutfiani Putri", role: "Project Manager & UI/UX Designer", img: "/img/team1.jpg" },
-    { name: "Safril Rendiantoro", role: "Project Manager & UI/UX Designer", img: "/img/team2.jpg" },
-    { name: "Agung Cahyandi", role: "Frontend Developer", img: "/img/team3.jpg" },
-    { name: "Athallah Dzaki Anggoro Seputro", role: "Backend Developer", img: "/img/team4.jpg" },
+    { name: "Irani Lutfiani Putri", role: "Project Manager & UI/UX Designer", img: "https://infokalteng.co/foto_berita/135642-dbb76965-0732-4b1b-bbe2-cbea751844c6.jpeg" },
+    { name: "Safril Rendiantoro", role: "Project Manager & UI/UX Designer", img: "https://media.istockphoto.com/id/824860820/id/foto/kera-barbary.jpg?s=1024x1024&w=is&k=20&c=fljqHlJ9ZJKsGTFWQ_Z6JX6uSCuK3btHw9LDJNvasdk=" },
+    { name: "Agung Cahyandi", role: "Frontend Developer", img: "https://akcdn.detik.net.id/community/media/visual/2017/12/06/6414c1ae-fcd1-49a6-8316-4a71c29f93ff_43.jpg?w=700&q=90" },
+    { name: "Athallah Dzaki Anggoro Seputro", role: "Backend Developer", img: "https://i.pinimg.com/736x/51/81/50/5181504867608b81c9f5b848eb2c967e.jpg" },
   ];
 
   return (

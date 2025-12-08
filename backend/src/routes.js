@@ -9,6 +9,7 @@ import kategoriRoutes from "./routes/kategori.routes.js";
 import komentarRoutes from "./routes/komentar.routes.js";
 import favoritRoutes from "./routes/favorit.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
+import profileRoutes from "./routes/profile.routes.js";
 
 const router = express.Router();
 
@@ -20,6 +21,7 @@ router.use("/resep", komentarRoutes); // /resep/:id/komentar
 
 // Protected routes (Anggota)
 router.use("/favorit", favoritRoutes);
+router.use("/me", profileRoutes);
 
 // Admin routes
 router.use("/admin", adminRoutes);

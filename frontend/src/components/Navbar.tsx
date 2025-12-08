@@ -4,16 +4,24 @@ import Link from "next/link";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faUser } from "@fortawesome/free-solid-svg-icons";
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const { user, isAuthenticated, logout } = useAuth();
   const pathname = usePathname();
+  const router = useRouter();
 
   // Jika pathname belum tersedia (rendering sementara), jangan render navbar
   if (!pathname) return null;
   const is404 = pathname === "/404" || pathname.includes("/404");
-  const isAuthRoute = pathname.toLowerCase() === "/login" || pathname.toLowerCase() === "/register" || pathname.toLowerCase().startsWith("/login") || pathname.toLowerCase().startsWith("/register");
+  const isAuthRoute =
+    pathname.toLowerCase() === "/login" ||
+    pathname.toLowerCase() === "/register" ||
+    pathname.toLowerCase().startsWith("/login") ||
+    pathname.toLowerCase().startsWith("/register");
 
   if (is404 || isAuthRoute) return null;
 
@@ -28,7 +36,9 @@ export default function Navbar() {
               alt="Logo"
               className="w-8 h-8 sm:w-10 sm:h-10"
             />
-            <span className="font-semibold text-brown-900 text-base sm:text-lg">Jamu Kita</span>
+            <span className="font-semibold text-[#b6770F] text-base sm:text-lg">
+              Jamu Kita
+            </span>
           </Link>
 
           {/* Desktop menu */}
@@ -51,12 +61,12 @@ export default function Navbar() {
             >
               Tentang Kami
             </Link>
-            
+
             {isAuthenticated ? (
               <div className="flex items-center space-x-2 lg:space-x-4">
-                <span className="text-xs lg:text-sm text-gray-700 hidden lg:inline">
-                  Hi, <span className="font-bold">{user?.nama}</span>
-                </span>
+                <a className="circler-full text-[#B6771D] hover:text-[#945d15] font-bold text-sm lg:text-base cursor-pointer" onClick={() => router.push("/profile")}>
+                  <FontAwesomeIcon icon={faUser} className="mr-2" />
+                </a>
                 <button
                   onClick={() => logout()}
                   className="bg-red-600 text-white px-3 lg:px-4 py-2 rounded-lg hover:bg-red-700 transition font-bold text-sm"
@@ -132,12 +142,18 @@ export default function Navbar() {
           >
             Tentang Kami
           </Link>
-          
+
           {isAuthenticated ? (
             <>
-              <div className="block text-gray-800 font-medium py-3 px-3 bg-yellow-200 rounded-lg">
-                Hi, <span className="font-bold text-[#B6771D]">{user?.nama}</span>
-              </div>
+              <a
+                className="rounded-lg text-[#B6771D] hover:bg-yellow-200 font-semibold py-3 px-3 block transition"
+                onClick={() => {
+                  router.push("/profile");
+                  setMenuOpen(false);
+                }}
+              >
+                <i className="mr-2 fas fa-user"></i>
+              </a>
               <button
                 onClick={() => {
                   logout();
