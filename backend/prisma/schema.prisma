@@ -8,15 +8,16 @@ datasource db {
 }
 
 model User {
-  id        Int       @id @default(autoincrement())
-  nama      String
-  email     String    @unique
-  password  String
-  role      UserRole  @default(anggota)
-  createdAt DateTime  @default(now())
-  userToken String?   @db.Text
-  komentar  Komentar[]
-  favorit   Favorit[]
+  id            Int             @id @default(autoincrement())
+  nama          String
+  email         String          @unique
+  password      String
+  role          UserRole        @default(anggota)
+  createdAt     DateTime        @default(now())
+  userToken     String?         @db.Text
+  komentar      Komentar[]
+  favorit       Favorit[]
+  recentSearch  RecentSearch[]
 
   @@map("users")
 }
@@ -75,6 +76,19 @@ model Favorit {
   @@index([userId])
   @@index([resepId])
   @@map("favorit")
+}
+
+model RecentSearch {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  query       String   @db.VarChar(255)
+  resultCount Int      @default(0)
+  createdAt   DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([createdAt])
+  @@map("recent_search")
 }
 
 enum UserRole {

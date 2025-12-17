@@ -73,6 +73,21 @@ export const ResepController = {
       next(error);
     }
   },
+
+  // GET /resep/top/weekly - Get top 7 resep minggu ini
+  async getTop7Weekly(req, res, next) {
+    try {
+      const top7 = await ResepModel.getTop7Weekly();
+
+      res.status(200).json({
+        success: true,
+        message: "Berhasil mendapatkan TOP 7 resep minggu ini",
+        data: top7,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
 };
 
 export const AdminResepController = {

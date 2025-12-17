@@ -1,85 +1,21 @@
+// Import Types from centralized types folder
+import type {
+  ApiResponse,
+  User,
+  AuthResponse,
+  RegisterData,
+  LoginData,
+  ActivityHistory,
+  Kategori,
+  Resep,
+  ResepListResponse,
+  SearchResepParams,
+  GetResepParams,
+  SaveRecentSearchData,
+  RecentSearchItem,
+} from "@/types";
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/v1";
-
-export interface ApiResponse<T = any> {
-  success: boolean;
-  message: string;
-  data?: T;
-  errors?: string[];
-}
-
-export interface User {
-  id: number;
-  nama: string;
-  email: string;
-  role: "anggota" | "admin";
-}
-
-export interface AuthResponse {
-  user: User;
-  access_token: string;
-}
-
-export interface RegisterData {
-  nama: string;
-  email: string;
-  password: string;
-}
-
-export interface LoginData {
-  email: string;
-  password: string;
-}
-
-export interface ActivityFavoritesItem {
-  id: string;
-  judul: string;
-  deskripsi: string;
-  kategori: Kategori;
-  gambarURL: string | null;
-  createdAt: string;
-}
-
-export interface ActivityCommentsItem {
-  id: number;
-  resepId: string;
-  judul: string;
-  isiKomentar: string;
-  rating: number;
-  kategori: Kategori;
-  tanggalPosting: string;
-}
-
-export interface ActivityHistory {
-  favorites: ActivityFavoritesItem[];
-  comments: ActivityCommentsItem[];
-}
-
-export interface Kategori {
-  id: number;
-  nama: string;
-}
-
-export interface Resep {
-  id: string;
-  judul: string;
-  deskripsi: string;
-  gambarURL: string | null;
-  kategori: Kategori;
-  rataRataRating: number;
-  sumberLiteratur?: string | null;
-  bahan?: string[];
-  langkahPembuatan?: string[];
-}
-
-export interface ResepListResponse {
-  data: Resep[];
-  pagination: {
-    page: number;
-    limit: number;
-    total: number;
-    totalPages: number;
-  };
-}
 
 class ApiService {
   private getHeaders(includeAuth: boolean = false): HeadersInit {
@@ -192,12 +128,7 @@ class ApiService {
   }
 
   // Resep endpoints
-  async getResepList(params?: {
-    q?: string;
-    kategori?: string;
-    page?: number;
-    limit?: number;
-  }): Promise<ApiResponse<ResepListResponse>> {
+  async getResepList(params?: GetResepParams): Promise<ApiResponse<ResepListResponse>> {
     try {
       const queryParams = new URLSearchParams();
       if (params?.q) queryParams.append("q", params.q);
@@ -233,15 +164,7 @@ class ApiService {
     return await response.json();
   }
 
-  async searchResep(params?: {
-    keyword?: string;
-    kategoriId?: number;
-    minRating?: number;
-    sortBy?: "createdAt" | "rating" | "judul";
-    sortOrder?: "asc" | "desc";
-    page?: number;
-    limit?: number;
-  }): Promise<ApiResponse<ResepListResponse>> {
+  async searchResep(params?: SearchResepParams): Promise<ApiResponse<ResepListResponse>> {
     const queryParams = new URLSearchParams();
     if (params?.keyword) queryParams.append("keyword", params.keyword);
     if (params?.kategoriId) queryParams.append("kategoriId", params.kategoriId.toString());
@@ -264,6 +187,15 @@ class ApiService {
 
   async getKategoriList(): Promise<ApiResponse<Kategori[]>> {
     const response = await fetch(`${API_BASE_URL}/kategori`, {
+      method: "GET",
+      headers: this.getHeaders(),
+    });
+
+    return await response.json();
+  }
+
+  async getTop7Weekly(): Promise<ApiResponse<Resep[]>> {
+    const response = await fetch(`${API_BASE_URL}/resep/top/weekly`, {
       method: "GET",
       headers: this.getHeaders(),
     });
@@ -303,6 +235,44 @@ class ApiService {
   async getActivityHistory(): Promise<ApiResponse<ActivityHistory>> {
     const response = await fetch(`${API_BASE_URL}/me/activity`, {
       method: "GET",
+      headers: this.getHeaders(true),
+    });
+
+    return await response.json();
+  }
+
+  // Recent Search endpoints
+  async getRecentSearches(): Promise<ApiResponse<RecentSearchItem[]>> {
+    const response = await fetch(`${API_BASE_URL}/recent-search`, {
+      method: "GET",
+      headers: this.getHeaders(true),
+    });
+
+    return await response.json();
+  }
+
+  async saveRecentSearch(query: string, resultCount: number = 0): Promise<ApiResponse<RecentSearchItem>> {
+    const response = await fetch(`${API_BASE_URL}/recent-search`, {
+      method: "POST",
+      headers: this.getHeaders(true),
+      body: JSON.stringify({ query, resultCount }),
+    });
+
+    return await response.json();
+  }
+
+  async deleteRecentSearch(id: number): Promise<ApiResponse<any>> {
+    const response = await fetch(`${API_BASE_URL}/recent-search/${id}`, {
+      method: "DELETE",
+      headers: this.getHeaders(true),
+    });
+
+    return await response.json();
+  }
+
+  async clearAllRecentSearches(): Promise<ApiResponse<any>> {
+    const response = await fetch(`${API_BASE_URL}/recent-search`, {
+      method: "DELETE",
       headers: this.getHeaders(true),
     });
 

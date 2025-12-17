@@ -9,7 +9,8 @@ import AccountSettings from "@/components/profile/AccountSettings";
 import SavedList from "@/components/profile/SavedList";
 import ReviewsList from "@/components/profile/ReviewsList";
 import { useAuth } from "@/context/AuthContext";
-import { apiService, ActivityHistory, Resep } from "@/lib/api";
+import { apiService } from "@/lib/api";
+import type { ActivityHistory, Resep } from "@/types";
 
 
 export default function ProfilePage() {

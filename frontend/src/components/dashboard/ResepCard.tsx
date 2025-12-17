@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faStar } from "@fortawesome/free-solid-svg-icons";
-import { Resep } from "@/lib/api";
+import type { Resep } from "@/types";
 
 interface ResepCardProps {
   resep: Resep;

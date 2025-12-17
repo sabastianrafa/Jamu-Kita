@@ -1,128 +1,332 @@
 "use client";
 
 import { useState, useEffect, Suspense } from "react";
-import NavbarDashboard from "@/components/dashboard/Navbardashboard";
 import JamuCard from "@/components/dashboard/JamuCard";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
+import { saveRecentSearch } from "@/lib/recentSearch";
+import { apiService } from "@/lib/api";
+import type { Resep, Kategori } from "@/types";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faFilter, faXmark } from "@fortawesome/free-solid-svg-icons";
 
-// Data jamu lengkap
-const jamuData = [
-  {
-    id: 1,
-    name: "Kunyit Asam",
-    image: "/images/jamu1.jpg",
-    rating: 4.9,
-    benefits: [
-      "Meningkatkan daya tahan tubuh",
-      "Membantu pencernaan",
-      "Mengurangi peradangan",
-    ],
-    ingredients: ["100 gr Kunyit", "50 gr Asam Jawa", "2 sdm Gula Merah", "500 ml Air"],
-    steps: [
-      "Cuci kunyit hingga bersih",
-      "Rebus kunyit dan air hingga mendidih",
-      "Tambahkan asam jawa dan gula merah",
-      "Saring dan sajikan hangat",
-    ],
-  },
-  {
-    id: 2,
-    name: "Beras Kencur",
-    image: "/images/jamu2.jpg",
-    rating: 4.8,
-    benefits: [
-      "Menghilangkan pegal linu",
-      "Meningkatkan nafsu makan",
-      "Meredakan batuk dan sakit tenggorokan",
-    ],
-    ingredients: [
-      "100 gr beras putih",
-      "150 gr kencur segar",
-      "50 gr jahe",
-      "1 sdm asam jawa",
-      "150-200 gr gula merah",
-      "1 liter air",
-    ],
-    steps: [
-      "Rendam beras dan kencur",
-      "Rebus jahe, kencur, dan beras",
-      "Tambahkan gula dan asam jawa",
-      "Saring dan sajikan",
-    ],
-  },
-  {
-    id: 3,
-    name: "Temulawak",
-    image: "/images/jamu3.jpg",
-    rating: 4.7,
-    benefits: ["Meningkatkan nafsu makan", "Mendukung fungsi hati", "Anti-inflamasi"],
-    ingredients: ["100 gr temulawak", "50 gr jahe", "500 ml air", "Gula aren secukupnya"],
-    steps: [
-      "Cuci temulawak dan jahe",
-      "Rebus dengan air hingga mendidih",
-      "Tambahkan gula aren",
-      "Saring dan sajikan hangat",
-    ],
-  },
-  {
-    id: 4,
-    name: "Sari Delima",
-    image: "/images/jamu4.jpg",
-    rating: 4.6,
-    benefits: ["Menjaga kesehatan jantung", "Antioksidan tinggi"],
-    ingredients: ["Buah delima 2 buah", "Gula secukupnya"],
-    steps: ["Peras buah delima", "Tambahkan gula", "Aduk rata dan sajikan"],
-  },
-  {
-    id: 5,
-    name: "Jahe Merah",
-    image: "/images/jamu5.jpg",
-    rating: 4.8,
-    benefits: ["Meningkatkan imun tubuh", "Menghangatkan badan"],
-    ingredients: ["100 gr jahe merah", "500 ml air", "Gula merah secukupnya"],
-    steps: [
-      "Cuci jahe merah",
-      "Rebus dengan air dan gula merah",
-      "Saring dan sajikan hangat",
-    ],
-  },
-];
+interface SearchFilters {
+  kategoriId?: string;
+  minRating?: string;
+  sortBy?: "createdAt" | "rating" | "judul";
+  sortOrder?: "asc" | "desc";
+}
 
 function SearchContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
+  const { isAuthenticated } = useAuth();
   const query = searchParams.get("q") || "";
-  const [results, setResults] = useState<typeof jamuData>([]);
+  
+  const [results, setResults] = useState<Resep[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [kategoriList, setKategoriList] = useState<Kategori[]>([]);
+  const [showFilters, setShowFilters] = useState(false);
+  const [filters, setFilters] = useState<SearchFilters>({
+    sortBy: "createdAt",
+    sortOrder: "desc",
+  });
 
+  // Redirect ke login jika belum login
   useEffect(() => {
-    const filtered = jamuData.filter((jamu) =>
-      jamu.name.toLowerCase().includes(query.toLowerCase())
+    if (!isAuthenticated) {
+      router.push("/login");
+    }
+  }, [isAuthenticated, router]);
+
+  // Load kategori list
+  useEffect(() => {
+    const loadKategori = async () => {
+      try {
+        const response = await apiService.getKategoriList();
+        if (response.success && response.data) {
+          setKategoriList(response.data);
+        }
+      } catch (error) {
+        console.error("Failed to load categories:", error);
+      }
+    };
+
+    if (isAuthenticated) {
+      loadKategori();
+    }
+  }, [isAuthenticated]);
+
+  // Perform search
+  useEffect(() => {
+    if (!query || !isAuthenticated) return;
+
+    const performSearch = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        // Call backend search API
+        const response = await apiService.searchResep({
+          keyword: query,
+          kategoriId: filters.kategoriId,
+          minRating: filters.minRating,
+          sortBy: filters.sortBy,
+          sortOrder: filters.sortOrder,
+          page: 1,
+          limit: 50,
+        });
+
+        if (response.success && response.data) {
+          setResults(response.data.data);
+
+          // Save to recent search
+          try {
+            await saveRecentSearch(query, response.data.data.length);
+          } catch (err) {
+            console.error("Failed to save recent search:", err);
+          }
+        } else {
+          throw new Error(response.message || "Gagal melakukan pencarian");
+        }
+      } catch (err) {
+        console.error("Search error:", err);
+        setError(err instanceof Error ? err.message : "Terjadi kesalahan saat mencari");
+        setResults([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    performSearch();
+  }, [query, filters, isAuthenticated]);
+
+  const handleFilterChange = (newFilters: Partial<SearchFilters>) => {
+    setFilters((prev) => ({ ...prev, ...newFilters }));
+  };
+
+  const clearFilters = () => {
+    setFilters({
+      sortBy: "createdAt",
+      sortOrder: "desc",
+    });
+  };
+
+  const hasActiveFilters = filters.kategoriId || filters.minRating;
+
+  if (!isAuthenticated) {
+    return (
+      <div className="text-center py-16">
+        <p className="text-gray-600">Redirecting to login...</p>
+      </div>
     );
-    setResults(filtered);
-  }, [query]);
+  }
 
   return (
     <>
-      <h2 className="text-2xl font-bold mb-6">Hasil Pencarian: "{query}"</h2>
+      {/* Header */}
+      <div className="mb-6">
+        <h2 className="text-2xl md:text-3xl font-bold text-[#29372a] mb-2">
+          Hasil Pencarian: <span className="text-[#B6771D]">"{query}"</span>
+        </h2>
+        <p className="text-gray-600">
+          {loading ? "Mencari resep jamu..." : `${results.length} resep ditemukan`}
+        </p>
+      </div>
 
-      {results.length > 0 ? (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {results.map((jamu) => (
-            <JamuCard
-              index={jamu.id}
-              key={jamu.id}
-              title={jamu.name}
-              img={jamu.image}
-              rating={jamu.rating}
-              benefits={jamu.benefits}
-              ingredients={jamu.ingredients}
-              steps={jamu.steps}
+      {/* Filter Toggle & Info */}
+      <div className="flex items-center justify-between mb-4">
+        <button
+          onClick={() => setShowFilters(!showFilters)}
+          className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition"
+        >
+          <FontAwesomeIcon icon={faFilter} className="text-[#B6771D]" />
+          <span className="font-medium">Filter & Urutkan</span>
+          {hasActiveFilters && (
+            <span className="bg-[#B6771D] text-white text-xs px-2 py-0.5 rounded-full">
+              {(filters.kategoriId ? 1 : 0) + (filters.minRating ? 1 : 0)}
+            </span>
+          )}
+        </button>
+
+        {hasActiveFilters && (
+          <button
+            onClick={clearFilters}
+            className="flex items-center gap-2 px-4 py-2 text-red-600 hover:text-red-700 transition"
+          >
+            <FontAwesomeIcon icon={faXmark} />
+            <span className="text-sm font-medium">Reset Filter</span>
+          </button>
+        )}
+      </div>
+
+      {/* Filter Panel */}
+      {showFilters && (
+        <div className="bg-white rounded-lg p-4 mb-6 shadow-sm border border-gray-200 animate-fadeIn">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Kategori Filter */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                📁 Kategori
+              </label>
+              <select
+                value={filters.kategoriId || ""}
+                onChange={(e) =>
+                  handleFilterChange({
+                    kategoriId: e.target.value || undefined,
+                  })
+                }
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B6771D] bg-white"
+              >
+                <option value="">Semua Kategori</option>
+                {kategoriList.map((kat) => (
+                  <option key={kat.id} value={kat.id}>
+                    {kat.nama}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Rating Filter */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                ⭐ Rating Minimal
+              </label>
+              <select
+                value={filters.minRating || ""}
+                onChange={(e) =>
+                  handleFilterChange({
+                    minRating: e.target.value || undefined,
+                  })
+                }
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B6771D] bg-white"
+              >
+                <option value="">Semua Rating</option>
+                <option value="4.5">⭐ 4.5 ke atas</option>
+                <option value="4.0">⭐ 4.0 ke atas</option>
+                <option value="3.5">⭐ 3.5 ke atas</option>
+                <option value="3.0">⭐ 3.0 ke atas</option>
+              </select>
+            </div>
+
+            {/* Sort By */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                🔄 Urutkan Berdasarkan
+              </label>
+              <select
+                value={`${filters.sortBy}-${filters.sortOrder}`}
+                onChange={(e) => {
+                  const [sortBy, sortOrder] = e.target.value.split("-");
+                  handleFilterChange({
+                    sortBy: sortBy as any,
+                    sortOrder: sortOrder as any,
+                  });
+                }}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B6771D] bg-white"
+              >
+                <option value="createdAt-desc">🆕 Terbaru</option>
+                <option value="createdAt-asc">🕐 Terlama</option>
+                <option value="rating-desc">⭐ Rating Tertinggi</option>
+                <option value="rating-asc">⭐ Rating Terendah</option>
+                <option value="judul-asc">🔤 Nama A-Z</option>
+                <option value="judul-desc">🔤 Nama Z-A</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Loading State */}
+      {loading && (
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+          {[...Array(8)].map((_, i) => (
+            <div
+              key={i}
+              className="h-64 bg-gray-200 rounded-xl animate-pulse"
             />
           ))}
         </div>
-      ) : (
-        <p className="text-center text-gray-500 mt-8">
-          Tidak ada jamu yang ditemukan untuk kata kunci "{query}".
-        </p>
+      )}
+
+      {/* Error State */}
+      {error && !loading && (
+        <div className="text-center py-16 bg-red-50 rounded-lg border border-red-200">
+          <div className="text-5xl mb-4">❌</div>
+          <p className="text-red-600 font-semibold mb-2">{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="mt-4 px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
+          >
+            Coba Lagi
+          </button>
+        </div>
+      )}
+
+      {/* Results */}
+      {!loading && !error && results.length > 0 && (
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+          {results.map((resep, index) => (
+            <JamuCard
+              key={resep.id}
+              index={index}
+              title={resep.judul}
+              img={resep.gambarURL || "/img/jamu-default.jpg"}
+              rating={resep.rataRataRating}
+              benefits={[resep.deskripsi]}
+              ingredients={[]}
+              steps={[]}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* Empty State */}
+      {!loading && !error && results.length === 0 && query && (
+        <div className="text-center py-16 bg-gradient-to-b from-yellow-50 to-white rounded-lg border border-yellow-200">
+          <div className="text-7xl mb-4">🔍</div>
+          <h3 className="text-2xl font-bold text-gray-800 mb-2">
+            Tidak Ada Hasil Ditemukan
+          </h3>
+          <p className="text-gray-600 mb-6 max-w-md mx-auto">
+            Tidak ada resep jamu yang cocok dengan kata kunci <strong>"{query}"</strong>
+            {hasActiveFilters && " dan filter yang dipilih"}
+          </p>
+          
+          <div className="bg-white rounded-lg p-6 max-w-lg mx-auto border border-gray-200">
+            <p className="font-semibold text-gray-800 mb-3">💡 Tips Pencarian:</p>
+            <ul className="text-left text-sm text-gray-600 space-y-2">
+              <li className="flex items-start gap-2">
+                <span className="text-[#B6771D] font-bold">•</span>
+                <span>Coba kata kunci yang lebih umum (misalnya: "kunyit" bukan "kunyit asem")</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-[#B6771D] font-bold">•</span>
+                <span>Periksa ejaan kata kunci Anda</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-[#B6771D] font-bold">•</span>
+                <span>Gunakan sinonim atau kata lain yang relevan</span>
+              </li>
+              {hasActiveFilters && (
+                <li className="flex items-start gap-2">
+                  <span className="text-[#B6771D] font-bold">•</span>
+                  <span>Coba hapus beberapa filter untuk hasil lebih luas</span>
+                </li>
+              )}
+            </ul>
+          </div>
+
+          {hasActiveFilters && (
+            <button
+              onClick={clearFilters}
+              className="mt-6 px-6 py-3 bg-[#B6771D] text-white rounded-lg hover:bg-[#945d15] transition font-semibold"
+            >
+              Reset Semua Filter
+            </button>
+          )}
+        </div>
       )}
     </>
   );
@@ -131,12 +335,19 @@ function SearchContent() {
 export default function SearchResultsPage() {
   return (
     <div className="min-h-screen bg-[#FFFBEA]">
-      <NavbarDashboard />
-
-      <div className="pt-32 px-8">
-        <Suspense fallback={<div className="text-center p-8">Loading search results...</div>}>
-          <SearchContent />
-        </Suspense>
+      <div className="pt-24 px-4 sm:px-6 lg:px-8 pb-16">
+        <div className="max-w-7xl mx-auto">
+          <Suspense
+            fallback={
+              <div className="text-center py-16">
+                <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-[#B6771D] mx-auto mb-4"></div>
+                <p className="text-gray-600 text-lg">Memuat hasil pencarian...</p>
+              </div>
+            }
+          >
+            <SearchContent />
+          </Suspense>
+        </div>
       </div>
     </div>
   );

@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { apiService, Resep } from "@/lib/api";
+import { apiService } from "@/lib/api";
+import type { Resep } from "@/types";
 import ResepCard from "./ResepCard";
 import { useRouter } from "next/navigation";
 

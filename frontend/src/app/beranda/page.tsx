@@ -9,7 +9,6 @@ import Navbar from "@/components/Navbar";
 import BannerSlider from "@/components/dashboard/BannerSlider";
 import CategoryCarousel from "@/components/dashboard/CategoryCarousel";
 import Top7Carousel from "@/components/dashboard/Top7Carousel";
-import Top7Carousellanding from "@/components/dashboard/Top7Carousellanding";
 import RecentSearchCarousel from "@/components/dashboard/RecentSearchCarousel";
 import ResepGridPanel from "@/components/dashboard/ResepGridPanel";
 import ProtectedRoute from "@/components/ProtectedRoute";
@@ -54,7 +53,7 @@ export default function HybridPage() {
                 </h3>
               </div>
 
-              {isLoggedIn ? <Top7Carousel /> : <Top7Carousellanding />}
+              <Top7Carousel />
             </section>
 
             {/* All Resep Section - Grid of recipes */}

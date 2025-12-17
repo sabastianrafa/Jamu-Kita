@@ -1,6 +1,6 @@
 "use client";
 
-import { ActivityCommentsItem } from "@/lib/api";
+import type { ActivityCommentsItem } from "@/types";
 
 interface ReviewsListProps {
   comments: ActivityCommentsItem[];

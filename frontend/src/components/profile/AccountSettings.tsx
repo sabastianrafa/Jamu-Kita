@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { apiService } from "@/lib/api";
-import { User } from "@/lib/api";
+import type { User } from "@/types";
 
 interface AccountSettingsProps {
   user: User | null;

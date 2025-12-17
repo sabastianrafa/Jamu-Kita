@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useState } from "react";
-import { Resep } from "@/lib/api";
+import type { Resep } from "@/types";
 
 interface SavedListProps {
   favorites: Resep[];

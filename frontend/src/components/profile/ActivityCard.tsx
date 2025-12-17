@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { FaHistory, FaChevronRight } from "react-icons/fa";
 import { useState } from "react";
-import { ActivityHistory } from "@/lib/api";
+import type { ActivityHistory } from "@/types";
 
 interface ActivityCardProps {
   activity: ActivityHistory;

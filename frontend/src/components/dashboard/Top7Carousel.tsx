@@ -1,64 +1,87 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import JamuCard from "./JamuCard";
+import { apiService } from "@/lib/api";
+import type { Resep } from "@/types";
 
 export default function Top7Carousel() {
-  const data = [
-    {
-      title: "Kunyit Asam",
-      img: "/img/jamu1.jpg",
-      rating: 4.9,
-      benefits: ["Meningkatkan imun", "Melancarkan pencernaan", "Menghangatkan tubuh"],
-      ingredients: ["100 gr kunyit", "50 gr asam jawa", "Gula merah secukupnya", "Air 500ml"],
-      steps: ["Cuci kunyit", "Rebus dengan air", "Tambahkan asam jawa & gula", "Saring & sajikan"]
-    },
-    {
-      title: "Beras Kencur",
-      img: "/img/jamu2.jpg",
-      rating: 4.8,
-      benefits: ["Meredakan pegal linu", "Meningkatkan nafsu makan", "Melancarkan pencernaan"],
-      ingredients: ["100 gr beras", "150 gr kencur", "50 gr jahe", "150 gr gula merah", "3 sdm air asam jawa"],
-      steps: ["Cuci dan rendam beras", "Haluskan beras & kencur", "Rebus dengan air & gula merah", "Tambahkan asam jawa", "Saring dan sajikan"]
-    },
-    {
-      title: "Temulawak",
-      img: "/img/jamu3.jpg",
-      rating: 4.7,
-      benefits: ["Meningkatkan nafsu makan", "Melancarkan pencernaan", "Membantu detoksifikasi"],
-      ingredients: ["100 gr temulawak", "50 gr jahe", "Gula merah", "Air 500ml"],
-      steps: ["Cuci temulawak", "Parut dan rebus dengan air", "Tambahkan gula merah", "Saring & sajikan"]
-    },
-    {
-      title: "Jahe Merah",
-      img: "/img/jamu4.jpg",
-      rating: 4.8,
-      benefits: ["Menghangatkan tubuh", "Meredakan masuk angin", "Meningkatkan imun"],
-      ingredients: ["100 gr jahe merah", "50 gr gula merah", "Air 500ml"],
-      steps: ["Cuci jahe", "Rebus dengan air & gula merah", "Saring & sajikan"]
-    },
-    {
-      title: "Jamu Urat",
-      img: "/img/jamu5.jpg",
-      rating: 4.6,
-      benefits: ["Meredakan pegal & nyeri otot", "Melancarkan peredaran darah"],
-      ingredients: ["100 gr kunyit", "50 gr kencur", "50 gr jahe", "Gula merah", "Air 500ml"],
-      steps: ["Cuci & haluskan bahan", "Rebus dengan air & gula merah", "Saring & sajikan"]
-    },
-  ];
+  const [data, setData] = useState<Resep[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchTop7 = async () => {
+      try {
+        setLoading(true);
+        const result = await apiService.getTop7Weekly();
+        
+        if (result.success && result.data) {
+          setData(result.data);
+        } else {
+          throw new Error(result.message || "Gagal mengambil data");
+        }
+      } catch (err) {
+        console.error("Error fetching top 7 recipes:", err);
+        setError(err instanceof Error ? err.message : "Terjadi kesalahan");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTop7();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="overflow-x-auto pb-2">
+        <div className="flex gap-4 w-max">
+          {[...Array(7)].map((_, i) => (
+            <div
+              key={i}
+              className="w-48 h-48 bg-gray-200 rounded-xl animate-pulse"
+            />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-8 text-red-600">
+        <p>❌ {error}</p>
+        <button
+          onClick={() => window.location.reload()}
+          className="mt-2 text-sm text-blue-600 underline"
+        >
+          Coba lagi
+        </button>
+      </div>
+    );
+  }
+
+  if (data.length === 0) {
+    return (
+      <div className="text-center py-8 text-gray-500">
+        <p>Belum ada resep populer minggu ini</p>
+      </div>
+    );
+  }
 
   return (
     <div className="overflow-x-auto pb-2">
       <div className="flex gap-4 w-max">
         {data.map((item, i) => (
           <JamuCard
-            key={i}
-             index={i} 
-            title={item.title}
-            img={item.img}
-            rating={item.rating}
-            benefits={item.benefits}
-            ingredients={item.ingredients}
-            steps={item.steps}
+            key={item.id}
+            index={i}
+            title={item.judul}
+            img={item.gambarURL || "/img/jamu-default.jpg"}
+            rating={item.rataRataRating}
+            benefits={[item.deskripsi]}
+            ingredients={item.bahan || []}
+            steps={item.langkahPembuatan || []}
           />
         ))}
       </div>

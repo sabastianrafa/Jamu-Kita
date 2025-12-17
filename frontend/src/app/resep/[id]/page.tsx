@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { apiService, Resep } from "@/lib/api";
+import { apiService } from "@/lib/api";
+import type { Resep } from "@/types";
 import Image from "next/image";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faStar, faArrowLeft, faBook } from "@fortawesome/free-solid-svg-icons";

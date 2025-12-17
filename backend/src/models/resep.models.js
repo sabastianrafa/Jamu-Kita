@@ -363,4 +363,87 @@ export const ResepModel = {
       where: { id },
     });
   },
+
+  // Get top 7 resep minggu ini (berdasarkan rating dan jumlah favorit)
+  async getTop7Weekly() {
+    // Ambil tanggal 7 hari yang lalu
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+    // Ambil semua resep dengan komentar dan favorit
+    const allResep = await prisma.resep.findMany({
+      include: {
+        kategori: true,
+        komentar: {
+          select: {
+            rating: true,
+            tanggalPosting: true,
+          },
+        },
+        favorit: {
+          select: {
+            id: true,
+            createdAt: true,
+          },
+        },
+      },
+    });
+
+    // Hitung skor untuk setiap resep
+    const resepWithScore = allResep.map((r) => {
+      // Rating dari semua komentar
+      const ratings = r.komentar.map((k) => k.rating);
+      const rataRataRating =
+        ratings.length > 0
+          ? ratings.reduce((a, b) => a + b, 0) / ratings.length
+          : 0;
+
+      // Jumlah komentar minggu ini
+      const komentarMinggIni = r.komentar.filter(
+        (k) => new Date(k.tanggalPosting) >= oneWeekAgo
+      ).length;
+
+      // Jumlah favorit minggu ini
+      const favoritMinggIni = r.favorit.filter(
+        (f) => new Date(f.createdAt) >= oneWeekAgo
+      ).length;
+
+      // Total favorit
+      const totalFavorit = r.favorit.length;
+
+      // Hitung skor (kombinasi rating, favorit, dan aktivitas minggu ini)
+      // Bobot: rating (40%), total favorit (30%), aktivitas minggu ini (30%)
+      const score = 
+        (rataRataRating * 0.4) + 
+        (totalFavorit * 0.3) + 
+        ((komentarMinggIni + favoritMinggIni) * 0.3);
+
+      return {
+        id: r.id,
+        judul: r.judul,
+        deskripsi: r.deskripsi,
+        gambarURL: r.gambarURL,
+        kategori: {
+          id: r.kategori.id,
+          nama: r.kategori.nama,
+        },
+        bahan: JSON.parse(r.bahan),
+        langkahPembuatan: JSON.parse(r.langkahPembuatan),
+        rataRataRating: Math.round(rataRataRating * 10) / 10,
+        totalKomentar: ratings.length,
+        totalFavorit: totalFavorit,
+        komentarMinggIni: komentarMinggIni,
+        favoritMinggIni: favoritMinggIni,
+        score: Math.round(score * 100) / 100,
+      };
+    });
+
+    // Sort berdasarkan score dan ambil top 7
+    const top7 = resepWithScore
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 7)
+      .map(({ score, komentarMinggIni, favoritMinggIni, ...rest }) => rest);
+
+    return top7;
+  },
 };

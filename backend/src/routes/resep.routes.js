@@ -8,6 +8,9 @@ const router = Router();
 // GET /resep - Get all resep (PUBLIC)
 router.get("/", validate({ query: getResepQuerySchema }), ResepController.getAll);
 
+// GET /resep/top/weekly - Get top 7 resep minggu ini (PUBLIC)
+router.get("/top/weekly", ResepController.getTop7Weekly);
+
 // GET /resep/search - Advanced search (PUBLIC)
 router.get("/search", validate({ query: searchResepQuerySchema }), ResepController.search);
 
