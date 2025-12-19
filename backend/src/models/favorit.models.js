@@ -69,7 +69,6 @@ export const FavoritModel = {
         resepId,
       },
     });
-    console.log("Result : ", count);
     return count > 0;
   },
 };

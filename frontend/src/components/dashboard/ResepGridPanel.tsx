@@ -33,9 +33,7 @@ export default function ResepGridPanel({ kategori, limit = 20 }: ResepGridPanelP
         page: currentPage,
         limit,
       });
-
-      console.log("[ResepGridPanel] API Response:", response);
-
+      
       if (response.success && response.data) {
         setResepList(response.data as any || []);
         setTotalPages(response.data.pagination?.totalPages || 1);

@@ -50,7 +50,6 @@ export default function ProfilePage() {
 
   // Proteksi halaman - redirect ke login jika melihat profil sendiri (tanpa UUID) dan tidak terautentikasi
   useEffect(() => {
-    console.log(isLoading, uuid, isAuthenticated);
     if (!isLoading && !uuid && !isAuthenticated) {
       router.push("/login");
     }

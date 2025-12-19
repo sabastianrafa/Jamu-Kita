@@ -14,7 +14,8 @@ export const handleError = (err, req, res, next) => {
         ? err.errors
         : [err.message || 'Internal Server Error'];
     
-    console.error(`Error [${statusCode}]:`, err);
+    if (process.env.NODE_ENV !== 'production')
+        console.error(`Error [${statusCode}]:`, err.message, errors);
 
     res.status(statusCode).json({
         success: false,

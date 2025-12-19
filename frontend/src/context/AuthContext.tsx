@@ -30,7 +30,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const storedUser = apiService.getStoredUser();
         
         if (!token || !storedUser) {
-          console.log("[AuthContext] No token or user data found");
           setUser(null);
           setIsAuthenticated(false);
           setIsLoading(false);

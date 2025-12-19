@@ -49,7 +49,6 @@ export default function ResepDetailPage() {
 
     try {
       const response = await apiService.getResepDetail(id);
-      console.log("[ResepDetail] API Response:", response);
 
       if (response.success && response.data) {
         setResep(response.data);
