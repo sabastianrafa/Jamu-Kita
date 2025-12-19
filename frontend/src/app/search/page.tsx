@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
 import JamuCard from "@/components/dashboard/JamuCard";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { saveRecentSearch } from "@/lib/recentSearch";
 import { apiService } from "@/lib/api";
-import type { Resep, Kategori } from "@/types";
+import type { Resep, Kategori, ResepListResponse } from "@/types";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFilter, faXmark } from "@fortawesome/free-solid-svg-icons";
 
@@ -20,8 +20,9 @@ interface SearchFilters {
 function SearchContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isLoading } = useAuth();
   const query = searchParams.get("q") || "";
+  const savedSearchRef = useRef<string>("");
   
   const [results, setResults] = useState<Resep[]>([]);
   const [loading, setLoading] = useState(false);
@@ -35,10 +36,10 @@ function SearchContent() {
 
   // Redirect ke login jika belum login
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (!isLoading && !isAuthenticated) {
       router.push("/login");
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, isLoading, router]);
 
   // Load kategori list
   useEffect(() => {
@@ -60,7 +61,7 @@ function SearchContent() {
 
   // Perform search
   useEffect(() => {
-    if (!query || !isAuthenticated) return;
+    if (!query || !isAuthenticated || isLoading) return;
 
     const performSearch = async () => {
       try {
@@ -79,14 +80,18 @@ function SearchContent() {
         });
 
         if (response.success && response.data) {
-          setResults(response.data.data);
-
-          // Save to recent search
-          try {
-            await saveRecentSearch(query, response.data.data.length);
-          } catch (err) {
-            console.error("Failed to save recent search:", err);
+          // Save to recent search - only if not already saved for this query
+          const ResultsCount = response.data.length;
+          const searchKey = `${query}-${JSON.stringify(filters)}`;
+          if (savedSearchRef.current !== searchKey) {
+            savedSearchRef.current = searchKey;
+            try {
+              await saveRecentSearch(query, ResultsCount);
+            } catch (err) {
+              console.error("Failed to save recent search:", err);
+            }
           }
+          setResults(response.data);
         } else {
           throw new Error(response.message || "Gagal melakukan pencarian");
         }
@@ -100,7 +105,7 @@ function SearchContent() {
     };
 
     performSearch();
-  }, [query, filters, isAuthenticated]);
+  }, [query, filters, isAuthenticated, isLoading]);
 
   const handleFilterChange = (newFilters: Partial<SearchFilters>) => {
     setFilters((prev) => ({ ...prev, ...newFilters }));
@@ -114,6 +119,15 @@ function SearchContent() {
   };
 
   const hasActiveFilters = filters.kategoriId || filters.minRating;
+
+  if (isLoading) {
+    return (
+      <div className="text-center py-16">
+        <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-[#B6771D] mx-auto mb-4"></div>
+        <p className="text-gray-600">Loading...</p>
+      </div>
+    );
+  }
 
   if (!isAuthenticated) {
     return (
@@ -271,6 +285,7 @@ function SearchContent() {
             <JamuCard
               key={resep.id}
               index={index}
+              id={resep.id}
               title={resep.judul}
               img={resep.gambarURL || "/img/jamu-default.jpg"}
               rating={resep.rataRataRating}

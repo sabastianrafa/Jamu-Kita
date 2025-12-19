@@ -19,8 +19,7 @@ export const RecentSearchModel = {
       where: {
         userId,
         query: {
-          equals: query,
-          mode: "insensitive",
+          equals: query
         },
       },
     });

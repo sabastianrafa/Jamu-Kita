@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { getRecentSearches, formatSearchTime, clearRecentSearches, removeRecentSearch } from "@/lib/recentSearch";
 import type { RecentSearchItem } from "@/types";
@@ -11,6 +11,7 @@ export default function RecentSearchCarousel() {
   const [recentSearches, setRecentSearches] = useState<RecentSearchItem[]>([]);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+  const hasLoadedRef = useRef(false);
 
   const loadRecentSearches = async () => {
     try {
@@ -25,7 +26,10 @@ export default function RecentSearchCarousel() {
   };
 
   useEffect(() => {
-    loadRecentSearches();
+    if (!hasLoadedRef.current) {
+      hasLoadedRef.current = true;
+      loadRecentSearches();
+    }
   }, []);
 
   const handleSearchClick = (query: string) => {

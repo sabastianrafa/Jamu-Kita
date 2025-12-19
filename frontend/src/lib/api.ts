@@ -164,7 +164,7 @@ class ApiService {
     return await response.json();
   }
 
-  async searchResep(params?: SearchResepParams): Promise<ApiResponse<ResepListResponse>> {
+  async searchResep(params?: SearchResepParams): Promise<ApiResponse<Resep[]>> {
     const queryParams = new URLSearchParams();
     if (params?.keyword) queryParams.append("keyword", params.keyword);
     if (params?.kategoriId) queryParams.append("kategoriId", params.kategoriId.toString());
@@ -178,7 +178,7 @@ class ApiService {
       `${API_BASE_URL}/resep/search${queryParams.toString() ? `?${queryParams.toString()}` : ""}`,
       {
         method: "GET",
-        headers: this.getHeaders(),
+        headers: this.getHeaders(true),
       }
     );
 

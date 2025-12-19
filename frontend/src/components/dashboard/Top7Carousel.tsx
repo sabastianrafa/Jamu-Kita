@@ -76,6 +76,7 @@ export default function Top7Carousel() {
           <JamuCard
             key={item.id}
             index={i}
+            id={item.id}
             title={item.judul}
             img={item.gambarURL || "/img/jamu-default.jpg"}
             rating={item.rataRataRating}

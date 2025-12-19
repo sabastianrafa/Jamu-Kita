@@ -2,7 +2,8 @@
 
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { apiService, User, RegisterData, LoginData } from "@/lib/api";
+import { apiService } from "@/lib/api";
+import type { User, RegisterData, LoginData } from "@/types";
 
 interface AuthContextType {
   user: User | null;
@@ -24,44 +25,65 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const initAuth = async () => {
-      const token = apiService.getStoredToken();
-      const storedUser = apiService.getStoredUser();
-      
-      if (token && storedUser) {
+      try {
+        const token = apiService.getStoredToken();
+        const storedUser = apiService.getStoredUser();
+        
+        if (!token || !storedUser) {
+          console.log("[AuthContext] No token or user data found");
+          setUser(null);
+          setIsAuthenticated(false);
+          setIsLoading(false);
+          return;
+        }
+
+        // Validate token expiration
         try {
           const payload = JSON.parse(atob(token.split(".")[1]));
-          if (payload.exp * 1000 > Date.now()) {
-            // Sync profile with backend
-            const profile = await apiService.getProfile();
-            if (profile.success && profile.data) {
-              setUser(profile.data);
-              localStorage.setItem("user_data", JSON.stringify(profile.data));
-              setIsAuthenticated(true);
-              console.log("[AuthContext] User authenticated on init:", profile.data.email);
-            } else {
-              apiService.clearToken();
-              setUser(null);
-              setIsAuthenticated(false);
-            }
-          } else {
+          if (payload.exp * 1000 <= Date.now()) {
             console.log("[AuthContext] Token expired");
             apiService.clearToken();
             setUser(null);
             setIsAuthenticated(false);
+            setIsLoading(false);
+            return;
           }
         } catch (error) {
           console.error("[AuthContext] Token parsing error:", error);
           apiService.clearToken();
           setUser(null);
           setIsAuthenticated(false);
+          setIsLoading(false);
+          return;
         }
-      } else {
-        console.log("[AuthContext] No token or user data found");
-        apiService.clearToken(); // Clear any orphaned data
+
+        // Sync profile with backend to ensure consistency
+        try {
+          const profile = await apiService.getProfile();
+          if (profile.success && profile.data) {
+            setUser(profile.data);
+            localStorage.setItem("user_data", JSON.stringify(profile.data));
+            setIsAuthenticated(true);
+            console.log("[AuthContext] User authenticated on init:", profile.data.email);
+          } else {
+            // If profile fetch fails, clear everything
+            apiService.clearToken();
+            setUser(null);
+            setIsAuthenticated(false);
+          }
+        } catch (error) {
+          console.error("[AuthContext] Profile fetch error:", error);
+          // Don't clear token on network errors, keep using stored data
+          setUser(storedUser);
+          setIsAuthenticated(true);
+        }
+      } catch (error) {
+        console.error("[AuthContext] Init auth error:", error);
         setUser(null);
         setIsAuthenticated(false);
+      } finally {
+        setIsLoading(false);
       }
-      setIsLoading(false);
     };
 
     initAuth();

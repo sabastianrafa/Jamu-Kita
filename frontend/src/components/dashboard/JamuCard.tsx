@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 interface JamuCardProps {
   index: number; // index card
+  id?: string; // resep uuid
   title: string;
   img: string;
   rating: number;
@@ -14,6 +16,7 @@ interface JamuCardProps {
 
 export default function JamuCard({
   index,
+  id,
   title,
   img,
   rating,
@@ -21,6 +24,7 @@ export default function JamuCard({
   ingredients = [],
   steps = [],
 }: JamuCardProps) {
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
 
   // Profile Popup
@@ -89,7 +93,13 @@ export default function JamuCard({
       {/* CARD */}
       <div
         className="w-full bg-white rounded-xl border shadow hover:scale-105 transition relative cursor-pointer"
-        onClick={() => setIsOpen(true)}
+        onClick={() => {
+          if (id) {
+            router.push(`/resep/${id}`);
+          } else {
+            setIsOpen(true);
+          }
+        }}
       >
         <img src={img} className="h-32 sm:h-36 md:h-40 w-full object-cover rounded-t-xl" alt={title} />
         <div className="p-2 sm:p-3">
