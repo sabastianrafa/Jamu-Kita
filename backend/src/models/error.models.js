@@ -14,8 +14,8 @@ export const handleError = (err, req, res, next) => {
         ? err.errors
         : [err.message || 'Internal Server Error'];
     
-    if (process.env.NODE_ENV !== 'production')
-        console.error(`Error [${statusCode}]:`, err.message, errors);
+    if (process.env.NODE_ENV == "debug")
+        console.error(`Error [${statusCode}]:`, err.message, errors, "Stack:", err.stack, "\n ENV:", process.env.NODE_ENV);
 
     res.status(statusCode).json({
         success: false,

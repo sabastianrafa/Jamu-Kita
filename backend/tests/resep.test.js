@@ -87,7 +87,9 @@ describe("Resep API Tests", () => {
 
   describe("GET /v1/resep/search", () => {
     it("should search resep by keyword", async () => {
-      const res = await request(app).get("/v1/resep/search?keyword=jahe");
+      const res = await request(app)
+        .get("/v1/resep/search?keyword=jahe")
+        .set("Authorization", `Bearer ${userToken}`);
 
       expect(res.status).to.equal(200);
       expect(res.body).to.have.property("success", true);
@@ -98,25 +100,30 @@ describe("Resep API Tests", () => {
     });
 
     it("should filter by kategoriId", async () => {
-      const res = await request(app).get(
-        `/v1/resep/search?kategoriId=${testData.kategori1.id}`
-      );
+      const res = await request(app)
+        .get(`/v1/resep/search?kategoriId=${testData.kategori1.id}`)
+        .set("Authorization", `Bearer ${userToken}`);
 
       expect(res.status).to.equal(200);
-      expect(res.body.filters).to.have.property("kategoriId", testData.kategori1.id.toString());
+      expect(res.body.filters).to.have.property(
+        "kategoriId",
+        testData.kategori1.id.toString()
+      );
     });
 
     it("should filter by minRating", async () => {
-      const res = await request(app).get("/v1/resep/search?minRating=4.0");
+      const res = await request(app)
+        .get("/v1/resep/search?minRating=4.0")
+        .set("Authorization", `Bearer ${userToken}`);
 
       expect(res.status).to.equal(200);
       expect(res.body.filters).to.have.property("minRating", "4.0");
     });
 
     it("should sort by rating descending", async () => {
-      const res = await request(app).get(
-        "/v1/resep/search?sortBy=rating&sortOrder=desc"
-      );
+      const res = await request(app)
+        .get("/v1/resep/search?sortBy=rating&sortOrder=desc")
+        .set("Authorization", `Bearer ${userToken}`);
 
       expect(res.status).to.equal(200);
       expect(res.body.filters).to.have.property("sortBy", "rating");
@@ -124,14 +131,18 @@ describe("Resep API Tests", () => {
     });
 
     it("should fail with invalid minRating", async () => {
-      const res = await request(app).get("/v1/resep/search?minRating=10");
+      const res = await request(app)
+        .get("/v1/resep/search?minRating=10")
+        .set("Authorization", `Bearer ${userToken}`);
 
       expect(res.status).to.equal(400);
       expect(res.body).to.have.property("success", false);
     });
 
     it("should fail with keyword too short", async () => {
-      const res = await request(app).get("/v1/resep/search?keyword=a");
+      const res = await request(app)
+        .get("/v1/resep/search?keyword=a")
+        .set("Authorization", `Bearer ${userToken}`);
 
       expect(res.status).to.equal(400);
       expect(res.body).to.have.property("success", false);
@@ -172,7 +183,11 @@ describe("Resep API Tests", () => {
           sumberLiteratur: "Buku Herbal Indonesia",
           kategoriId: testData.kategori1.id,
           bahan: ["Kunyit 100gr", "Asam Jawa 50gr", "Gula Merah"],
-          langkahPembuatan: ["1. Rebus kunyit", "2. Tambah asam", "3. Beri gula"],
+          langkahPembuatan: [
+            "1. Rebus kunyit",
+            "2. Tambah asam",
+            "3. Beri gula",
+          ],
         });
 
       expect(res.status).to.equal(201);
@@ -181,13 +196,15 @@ describe("Resep API Tests", () => {
     });
 
     it("should fail without authorization", async () => {
-      const res = await request(app).post("/v1/admin/resep").send({
-        judul: "Test Resep",
-        deskripsi: "Test description",
-        kategoriId: testData.kategori1.id,
-        bahan: ["Test"],
-        langkahPembuatan: ["Test"],
-      });
+      const res = await request(app)
+        .post("/v1/admin/resep")
+        .send({
+          judul: "Test Resep",
+          deskripsi: "Test description",
+          kategoriId: testData.kategori1.id,
+          bahan: ["Test"],
+          langkahPembuatan: ["Test"],
+        });
 
       expect(res.status).to.equal(401);
     });
@@ -247,7 +264,10 @@ describe("Resep API Tests", () => {
 
       expect(res.status).to.equal(200);
       expect(res.body).to.have.property("success", true);
-      expect(res.body.data).to.have.property("judul", "Updated Jamu Beras Kencur");
+      expect(res.body.data).to.have.property(
+        "judul",
+        "Updated Jamu Beras Kencur"
+      );
     });
 
     it("should fail without authorization", async () => {
@@ -309,7 +329,9 @@ describe("Resep API Tests", () => {
     });
 
     it("should fail without authorization", async () => {
-      const res = await request(app).delete(`/v1/admin/resep/${testData.resep1.id}`);
+      const res = await request(app).delete(
+        `/v1/admin/resep/${testData.resep1.id}`
+      );
 
       expect(res.status).to.equal(401);
     });

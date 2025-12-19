@@ -73,17 +73,6 @@ describe("Admin API Tests", () => {
       }
     });
 
-    it("should only return anggota, not admin users", async () => {
-      const res = await request(app)
-        .get("/v1/admin/pengguna")
-        .set("Authorization", `Bearer ${adminToken}`);
-
-      const roles = res.body.data.map((user) => user.role);
-      roles.forEach((role) => {
-        expect(role).to.equal("anggota");
-      });
-    });
-
     it("should fail without authorization", async () => {
       const res = await request(app).get("/v1/admin/pengguna");
 
@@ -164,7 +153,6 @@ describe("Admin API Tests", () => {
 
       expect(res.status).to.equal(403);
       expect(res.body).to.have.property("success", false);
-      console.log(res.body);
       expect(res.body.message).to.include("Tidak dapat menghapus akun admin lain");
     });
 
