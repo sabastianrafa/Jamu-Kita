@@ -1,33 +1,3 @@
-/*
-  Warnings:
-
-  - You are about to drop the `payment` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `rental` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `user` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `vehicle` table. If the table is not empty, all the data it contains will be lost.
-
-*/
--- DropForeignKey
-ALTER TABLE `payment` DROP FOREIGN KEY `payment_rentalId_fkey`;
-
--- DropForeignKey
-ALTER TABLE `rental` DROP FOREIGN KEY `rental_userId_fkey`;
-
--- DropForeignKey
-ALTER TABLE `rental` DROP FOREIGN KEY `rental_vehicleId_fkey`;
-
--- DropTable
-DROP TABLE `payment`;
-
--- DropTable
-DROP TABLE `rental`;
-
--- DropTable
-DROP TABLE `user`;
-
--- DropTable
-DROP TABLE `vehicle`;
-
 -- CreateTable
 CREATE TABLE `users` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
@@ -95,6 +65,19 @@ CREATE TABLE `favorit` (
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
+-- CreateTable
+CREATE TABLE `recent_search` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `userId` INTEGER NOT NULL,
+    `query` VARCHAR(255) NOT NULL,
+    `resultCount` INTEGER NOT NULL DEFAULT 0,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+
+    INDEX `recent_search_userId_idx`(`userId`),
+    INDEX `recent_search_createdAt_idx`(`createdAt`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
 -- AddForeignKey
 ALTER TABLE `resep` ADD CONSTRAINT `resep_kategoriId_fkey` FOREIGN KEY (`kategoriId`) REFERENCES `kategori`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
@@ -109,3 +92,6 @@ ALTER TABLE `favorit` ADD CONSTRAINT `favorit_userId_fkey` FOREIGN KEY (`userId`
 
 -- AddForeignKey
 ALTER TABLE `favorit` ADD CONSTRAINT `favorit_resepId_fkey` FOREIGN KEY (`resepId`) REFERENCES `resep`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `recent_search` ADD CONSTRAINT `recent_search_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `users`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;

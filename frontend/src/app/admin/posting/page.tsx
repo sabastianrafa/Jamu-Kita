@@ -221,14 +221,14 @@ export default function PostingPage() {
       <div className="bg-white rounded-3xl shadow-lg p-8">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold text-[#B6771D]" style={{ fontFamily: 'Inter' }}>
-            POSTINGAN
+            RESEP
           </h1>
           <button
             onClick={handleOpenModal}
             className="bg-[#B6771D] text-white px-6 py-3 rounded-lg font-bold hover:bg-[#8B5A15] transition-colors"
             style={{ fontFamily: 'Inter' }}
           >
-            + Tambah Postingan
+            + Tambah Resep
           </button>
         </div>
 

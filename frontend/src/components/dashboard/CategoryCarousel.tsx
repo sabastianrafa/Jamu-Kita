@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 
 const categories = [
+  { id: 0, name: "All", icon: Leaf },
   { id: 1, name: "Kesehatan", icon: HeartPulse },
   { id: 2, name: "Manfaat", icon: Sprout },
   { id: 3, name: "Rumahan", icon: LucideHouse },
@@ -25,7 +26,7 @@ export default function CategoryCarousel({
 }: {
   onSelect?: (cat: string) => void;
 }) {
-  const [active, setActive] = useState("Kesehatan");
+  const [active, setActive] = useState("All");
 
   const handleSelect = (name: string) => {
     setActive(name);
@@ -51,15 +52,15 @@ export default function CategoryCarousel({
                   transition-all duration-200 w-full text-left
                   ${
                     active === cat.name
-                      ? "bg-green-600 text-white border-green-700 shadow-md scale-[1.03]"
-                      : "bg-white hover:bg-green-100 border-gray-300"
+                      ? "bg-yellow-600 text-white border-yellow-700 shadow-md scale-[1.03]"
+                      : "bg-white hover:bg-yellow-100 border-gray-300"
                   }
                 `}
               >
                 <Icon
                   size={20}
                   className={
-                    active === cat.name ? "text-white" : "text-green-700"
+                    active === cat.name ? "text-white" : "text-yellow-700"
                   }
                 />
                 <span className="font-medium">{cat.name}</span>

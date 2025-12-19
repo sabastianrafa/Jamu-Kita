@@ -4,7 +4,7 @@ export const UserModel = {
   // Get all users (Anggota only, for admin)
   async getAll() {
     return await prisma.user.findMany({
-      where: { role: "anggota" },
+      //where: { role: "anggota" },
       select: {
         id: true,
         nama: true,

@@ -13,6 +13,22 @@ import type {
   GetResepParams,
   SaveRecentSearchData,
   RecentSearchItem,
+  AdminUser,
+  AdminResep,
+  CreateResepData,
+  UpdateResepData,
+  Komentar,
+  CreateKomentarData,
+  PublicProfileData,
+  Report,
+  CreateReportData,
+  Artikel,
+  CreateArtikelData,
+  UpdateArtikelData,
+  ArtikelListResponse,
+  ArtikelPopular,
+  ArtikelRecent,
+  ArtikelCategory,
 } from "@/types";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/v1";
@@ -128,7 +144,7 @@ class ApiService {
   }
 
   // Resep endpoints
-  async getResepList(params?: GetResepParams): Promise<ApiResponse<ResepListResponse>> {
+  async getResepList(params?: GetResepParams): Promise<ApiResponse<Resep[]>> {
     try {
       const queryParams = new URLSearchParams();
       if (params?.q) queryParams.append("q", params.q);
@@ -241,6 +257,15 @@ class ApiService {
     return await response.json();
   }
 
+  async getPublicProfile(userId: number): Promise<ApiResponse<PublicProfileData>> {
+    const response = await fetch(`${API_BASE_URL}/me/${userId}`, {
+      method: "GET",
+      headers: this.getHeaders(),
+    });
+
+    return await response.json();
+  }
+
   // Recent Search endpoints
   async getRecentSearches(): Promise<ApiResponse<RecentSearchItem[]>> {
     const response = await fetch(`${API_BASE_URL}/recent-search`, {
@@ -278,6 +303,225 @@ class ApiService {
 
     return await response.json();
   }
+
+  // Admin User Management endpoints
+  async getAllUsers(): Promise<ApiResponse<AdminUser[]>> {
+    const response = await fetch(`${API_BASE_URL}/admin/pengguna`, {
+      method: "GET",
+      headers: this.getHeaders(true),
+    });
+
+    return await response.json();
+  }
+
+  async deleteUser(id: number): Promise<ApiResponse<any>> {
+    const response = await fetch(`${API_BASE_URL}/admin/pengguna/${id}`, {
+      method: "DELETE",
+      headers: this.getHeaders(true),
+    });
+
+    return await response.json();
+  }
+
+  // Admin Resep Management endpoints
+  async createResep(data: CreateResepData): Promise<ApiResponse<AdminResep>> {
+    const response = await fetch(`${API_BASE_URL}/admin/resep`, {
+      method: "POST",
+      headers: this.getHeaders(true),
+      body: JSON.stringify(data),
+    });
+
+    return await response.json();
+  }
+
+  async updateResep(id: string, data: UpdateResepData): Promise<ApiResponse<AdminResep>> {
+    const response = await fetch(`${API_BASE_URL}/admin/resep/${id}`, {
+      method: "PUT",
+      headers: this.getHeaders(true),
+      body: JSON.stringify(data),
+    });
+
+    return await response.json();
+  }
+
+  async deleteResep(id: string): Promise<ApiResponse<any>> {
+    const response = await fetch(`${API_BASE_URL}/admin/resep/${id}`, {
+      method: "DELETE",
+      headers: this.getHeaders(true),
+    });
+
+    return await response.json();
+  }
+
+  // Komentar endpoints
+  async getKomentarByResepId(resepId: string): Promise<ApiResponse<Komentar[]>> {
+    const response = await fetch(`${API_BASE_URL}/resep/${resepId}/komentar`, {
+      method: "GET",
+      headers: this.getHeaders(),
+    });
+
+    return await response.json();
+  }
+
+  async createKomentar(resepId: string, data: CreateKomentarData): Promise<ApiResponse<Komentar>> {
+    const response = await fetch(`${API_BASE_URL}/resep/${resepId}/komentar`, {
+      method: "POST",
+      headers: this.getHeaders(true),
+      body: JSON.stringify(data),
+    });
+
+    return await response.json();
+  }
+
+  async getUserKomentar(resepId: string): Promise<ApiResponse<Komentar>> {
+    const response = await fetch(`${API_BASE_URL}/resep/${resepId}/komentar/me`, {
+      method: "GET",
+      headers: this.getHeaders(true),
+    });
+
+    return await response.json();
+  }
+
+  async updateKomentar(resepId: string, komentarId: number, data: CreateKomentarData): Promise<ApiResponse<Komentar>> {
+    const response = await fetch(`${API_BASE_URL}/resep/${resepId}/komentar/${komentarId}`, {
+      method: "PUT",
+      headers: this.getHeaders(true),
+      body: JSON.stringify(data),
+    });
+
+    return await response.json();
+  }
+
+  // ==================== ARTIKEL METHODS ====================
+
+  async getAllArtikel(params?: {
+    kategori?: string;
+    search?: string;
+    page?: number;
+    limit?: number;
+    sortBy?: string;
+    order?: string;
+  }): Promise<ApiResponse<Artikel[]>> {
+    const queryParams = new URLSearchParams();
+    if (params?.kategori) queryParams.append("kategori", params.kategori);
+    if (params?.search) queryParams.append("search", params.search);
+    if (params?.page) queryParams.append("page", params.page.toString());
+    if (params?.limit) queryParams.append("limit", params.limit.toString());
+    if (params?.sortBy) queryParams.append("sortBy", params.sortBy);
+    if (params?.order) queryParams.append("order", params.order);
+
+    const response = await fetch(
+      `${API_BASE_URL}/artikel?${queryParams.toString()}`,
+      {
+        method: "GET",
+        headers: this.getHeaders(),
+      }
+    );
+
+    return await response.json();
+  }
+
+  async getArtikelById(id: number): Promise<ApiResponse<Artikel>> {
+    const response = await fetch(`${API_BASE_URL}/artikel/${id}`, {
+      method: "GET",
+      headers: this.getHeaders(),
+    });
+
+    return await response.json();
+  }
+
+  async getPopularArtikel(limit?: number): Promise<ApiResponse<ArtikelPopular[]>> {
+    const queryParams = limit ? `?limit=${limit}` : "";
+    const response = await fetch(
+      `${API_BASE_URL}/artikel/popular${queryParams}`,
+      {
+        method: "GET",
+        headers: this.getHeaders(),
+      }
+    );
+
+    return await response.json();
+  }
+
+  async getRecentArtikel(limit?: number): Promise<ApiResponse<ArtikelRecent[]>> {
+    const queryParams = limit ? `?limit=${limit}` : "";
+    const response = await fetch(
+      `${API_BASE_URL}/artikel/recent${queryParams}`,
+      {
+        method: "GET",
+        headers: this.getHeaders(),
+      }
+    );
+
+    return await response.json();
+  }
+
+  async getArtikelCategories(): Promise<ApiResponse<ArtikelCategory[]>> {
+    const response = await fetch(`${API_BASE_URL}/artikel/categories`, {
+      method: "GET",
+      headers: this.getHeaders(),
+    });
+
+    return await response.json();
+  }
+
+  async createArtikel(data: CreateArtikelData): Promise<ApiResponse<Artikel>> {
+    const response = await fetch(`${API_BASE_URL}/artikel`, {
+      method: "POST",
+      headers: this.getHeaders(true),
+      body: JSON.stringify(data),
+    });
+
+    return await response.json();
+  }
+
+  async updateArtikel(id: number, data: UpdateArtikelData): Promise<ApiResponse<Artikel>> {
+    const response = await fetch(`${API_BASE_URL}/artikel/${id}`, {
+      method: "PUT",
+      headers: this.getHeaders(true),
+      body: JSON.stringify(data),
+    });
+
+    return await response.json();
+  }
+
+  async deleteArtikel(id: number): Promise<ApiResponse<void>> {
+    const response = await fetch(`${API_BASE_URL}/artikel/${id}`, {
+      method: "DELETE",
+      headers: this.getHeaders(true),
+    });
+
+    return await response.json();
+  }
+
+  // ==================== UPLOAD METHODS ====================
+
+  async uploadImage(data: {
+    image: string;
+    folder?: string;
+  }): Promise<ApiResponse<{ url: string; fileName: string }>> {
+    const response = await fetch(`${API_BASE_URL}/upload/image`, {
+      method: "POST",
+      headers: this.getHeaders(true),
+      body: JSON.stringify(data),
+    });
+
+    return await response.json();
+  }
+
+  async uploadMultipleImages(data: {
+    images: string[];
+    folder?: string;
+  }): Promise<ApiResponse<{ url: string; fileName: string }[]>> {
+    const response = await fetch(`${API_BASE_URL}/upload/images`, {
+      method: "POST",
+      headers: this.getHeaders(true),
+      body: JSON.stringify(data),
+    });
+
+    return await response.json();
+  }
+
 }
 
 export const apiService = new ApiService();

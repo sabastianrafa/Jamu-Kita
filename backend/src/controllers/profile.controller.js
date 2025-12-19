@@ -119,4 +119,77 @@ export const ProfileController = {
       next(error);
     }
   },
+
+  // GET /profile/:userId - dapatkan profil publik user lain
+  async getPublicProfile(req, res, next) {
+    try {
+      const { userId } = req.params;
+      const user = await UserModel.getById(parseInt(userId));
+
+      if (!user) {
+        throw new ResponseError(404, "Pengguna tidak ditemukan");
+      }
+
+      // Get user's public activity
+      const favorites = await prisma.favorit.findMany({
+        where: { userId: parseInt(userId) },
+        include: {
+          resep: {
+            include: { kategori: true },
+          },
+        },
+        orderBy: { createdAt: "desc" },
+        take: 20,
+      });
+
+      const comments = await prisma.komentar.findMany({
+        where: { userId: parseInt(userId) },
+        include: {
+          resep: {
+            include: { kategori: true },
+          },
+        },
+        orderBy: { tanggalPosting: "desc" },
+        take: 20,
+      });
+
+      res.status(200).json({
+        success: true,
+        message: "Berhasil mendapatkan profil publik",
+        data: {
+          user: {
+            id: user.id,
+            nama: user.nama,
+            role: user.role,
+            // Don't expose email for privacy
+          },
+          activity: {
+            favorites: favorites.map((f) => ({
+              id: f.resep.id,
+              judul: f.resep.judul,
+              deskripsi: f.resep.deskripsi,
+              kategori: f.resep.kategori,
+              gambarURL: f.resep.gambarURL,
+              createdAt: f.createdAt,
+            })),
+            comments: comments.map((c) => ({
+              id: c.id,
+              resepId: c.resepId,
+              judul: c.resep.judul,
+              isiKomentar: c.isiKomentar,
+              rating: c.rating,
+              kategori: c.resep.kategori,
+              tanggalPosting: c.tanggalPosting,
+            })),
+          },
+          stats: {
+            totalFavorites: favorites.length,
+            totalComments: comments.length,
+          },
+        },
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
 };

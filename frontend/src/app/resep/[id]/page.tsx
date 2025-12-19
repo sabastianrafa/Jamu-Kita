@@ -1,27 +1,49 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useEffect, useState, useRef } from "react";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { apiService } from "@/lib/api";
-import type { Resep } from "@/types";
+import type { Resep, Komentar, CreateKomentarData } from "@/types";
 import Image from "next/image";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faStar, faArrowLeft, faBook } from "@fortawesome/free-solid-svg-icons";
+import { useAnalytics } from "@/hooks/useAnalytics";
+import { trackRecipeView, trackComment } from "@/lib/gtag";
+import { faStar, faArrowLeft, faBook, faComment, faPaperPlane, faUser } from "@fortawesome/free-solid-svg-icons";
 
 export default function ResepDetailPage() {
   const params = useParams();
   const router = useRouter();
+  const { trackEvent } = useAnalytics();
   const [resep, setResep] = useState<Resep | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [komentars, setKomentars] = useState<Komentar[]>([]);
+  const [isLoadingKomentar, setIsLoadingKomentar] = useState(false);
+  const [showCommentForm, setShowCommentForm] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [userKomentar, setUserKomentar] = useState<Komentar | null>(null);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [commentFormData, setCommentFormData] = useState<CreateKomentarData>({
+    isiKomentar: '',
+    rating: 0,
+  });
+  const hasLoaded = useRef(false);
+  const hasTrackedView = useRef(false);
+
+  const dontTrack = useSearchParams().get("dontTrack") === "true";
 
   useEffect(() => {
-    if (params.id) {
-      fetchResepDetail(params.id as string);
+    if (!hasLoaded.current) {
+      hasLoaded.current = true;
+      if (params.id) {
+        fetchResepDetail(params.id as string);
+        fetchKomentars(params.id as string);
+      }
     }
   }, [params.id]);
 
   const fetchResepDetail = async (id: string) => {
+    
     setIsLoading(true);
     setError(null);
 
@@ -31,6 +53,16 @@ export default function ResepDetailPage() {
 
       if (response.success && response.data) {
         setResep(response.data);
+        // Track recipe view
+        if (!hasTrackedView.current || dontTrack === false) {
+          hasTrackedView.current = true;
+          trackRecipeView(response.data.id, response.data.judul);
+          await trackEvent('recipe_view', {
+            recipeId: response.data.id,
+            recipeTitle: response.data.judul,
+            kategori: response.data.kategori?.nama,
+          });
+        }
       } else {
         setError(response.message || "Resep tidak ditemukan");
       }
@@ -39,6 +71,104 @@ export default function ResepDetailPage() {
       setError("Terjadi kesalahan saat memuat resep");
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const fetchKomentars = async (id: string) => {
+    try {
+      setIsLoadingKomentar(true);
+      const response = await apiService.getKomentarByResepId(id);
+      if (response.success && response.data) {
+        setKomentars(response.data);
+      }
+
+      // Check if user has already commented
+      if (apiService.getStoredToken()) {
+        const userCommentResponse = await apiService.getUserKomentar(id);
+        if (userCommentResponse.success && userCommentResponse.data) {
+          setUserKomentar(userCommentResponse.data);
+          // Don't auto-show the form, let user click edit button
+        }
+      }
+    } catch (err) {
+      console.error('[ResepDetail] Error loading comments:', err);
+    } finally {
+      setIsLoadingKomentar(false);
+    }
+  };
+
+  const handleRatingClick = (rating: number) => {
+    if (!apiService.getStoredToken()) {
+      alert('Silakan login terlebih dahulu untuk memberikan rating');
+      router.push('/login');
+      return;
+    }
+    setCommentFormData({ ...commentFormData, rating });
+    setShowCommentForm(true);
+  };
+
+  const handleSubmitComment = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!apiService.getStoredToken()) {
+      alert('Silakan login terlebih dahulu');
+      router.push('/login');
+      return;
+    }
+
+    if (!commentFormData.isiKomentar.trim()) {
+      alert('Komentar tidak boleh kosong');
+      return;
+    }
+
+    if (commentFormData.rating === 0) {
+      alert('Silakan pilih rating terlebih dahulu');
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      let response;
+      
+      if (isEditMode && userKomentar) {
+        // Update existing comment
+        response = await apiService.updateKomentar(
+          params.id as string,
+          userKomentar.id,
+          commentFormData
+        );
+      } else {
+        // Create new comment
+        response = await apiService.createKomentar(params.id as string, commentFormData);
+      }
+      
+      if (response.success) {
+        // Track the comment
+        if (resep) {
+          trackComment(resep.judul, commentFormData.rating);
+          await trackEvent(isEditMode ? 'edit_comment' : 'add_comment', {
+            recipeId: resep.id,
+            recipeTitle: resep.judul,
+            rating: commentFormData.rating,
+          });
+        }
+
+        alert(isEditMode ? 'Komentar berhasil diperbarui!' : 'Komentar berhasil ditambahkan!');
+        setShowCommentForm(false);
+        setIsEditMode(false);
+        setCommentFormData({ isiKomentar: '', rating: 0 });
+        
+        // Refresh comments and resep detail
+        await fetchKomentars(params.id as string);
+        await fetchResepDetail(params.id as string);
+      } else {
+        throw new Error(response.message || 'Gagal menyimpan komentar');
+      }
+    } catch (err: any) {
+      console.error('[ResepDetail] Error submitting comment:', err);
+      alert(err.message || 'Terjadi kesalahan saat menyimpan komentar');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -162,7 +292,7 @@ export default function ResepDetailPage() {
 
             {/* Langkah Pembuatan */}
             {resep.langkahPembuatan && resep.langkahPembuatan.length > 0 && (
-              <div>
+              <div className="mb-8">
                 <h2 className="mb-4 text-xl font-bold text-[#4C763B]">Langkah Pembuatan</h2>
                 <ol className="space-y-4">
                   {resep.langkahPembuatan.map((langkah, index) => (
@@ -176,6 +306,250 @@ export default function ResepDetailPage() {
                 </ol>
               </div>
             )}
+
+            {/* Rating & Comments Section */}
+            <div className="border-t pt-8">
+              <div className="mb-6">
+                <h2 className="mb-4 text-2xl font-bold text-[#4C763B] flex items-center gap-2">
+                  <FontAwesomeIcon icon={faComment} className="h-6 w-6" />
+                  Ulasan & Rating
+                </h2>
+
+                {/* Rating Summary */}
+                <div className="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl p-6 mb-6">
+                  <div className="flex items-center gap-4">
+                    <div className="text-center">
+                      <div className="text-5xl font-bold text-yellow-600">
+                        {resep.rataRataRating > 0 ? resep.rataRataRating.toFixed(1) : '0.0'}
+                      </div>
+                      <div className="flex items-center justify-center mt-2">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <FontAwesomeIcon
+                            key={star}
+                            icon={faStar}
+                            className={`h-5 w-5 ${
+                              star <= Math.round(resep.rataRataRating)
+                                ? 'text-yellow-400'
+                                : 'text-gray-300'
+                            }`}
+                          />
+                        ))}
+                      </div>
+                      <p className="text-sm text-gray-600 mt-1">
+                        {komentars.length} ulasan
+                      </p>
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-gray-700 mb-3">
+                        {userKomentar 
+                          ? 'Anda sudah memberikan ulasan. Klik tombol di bawah untuk mengeditnya.'
+                          : 'Bagikan pengalaman Anda dengan resep ini!'}
+                      </p>
+                      {!showCommentForm && (
+                        <button
+                          onClick={() => {
+                            if (!apiService.getStoredToken()) {
+                              alert('Silakan login terlebih dahulu');
+                              router.push('/login');
+                              return;
+                            }
+                            if (userKomentar) {
+                              // Edit mode
+                              setIsEditMode(true);
+                              setCommentFormData({
+                                isiKomentar: userKomentar.isiKomentar,
+                                rating: userKomentar.rating,
+                              });
+                            } else {
+                              // Create mode
+                              setIsEditMode(false);
+                              setCommentFormData({ isiKomentar: '', rating: 0 });
+                            }
+                            setShowCommentForm(true);
+                          }}
+                          className="flex items-center gap-2 px-6 py-3 bg-[#4C763B] text-white rounded-lg hover:brightness-110 transition-all"
+                        >
+                          <FontAwesomeIcon icon={faPaperPlane} />
+                          {userKomentar ? 'Edit Ulasan Saya' : 'Tulis Ulasan'}
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Comment Form */}
+                {showCommentForm && (
+                  <div className="bg-white border-2 border-[#4C763B] rounded-xl p-6 mb-6">
+                    <h3 className="text-lg font-bold text-[#4C763B] mb-4">
+                      {isEditMode ? 'Edit Ulasan Anda' : 'Tulis Ulasan Anda'}
+                    </h3>
+                    <form onSubmit={handleSubmitComment}>
+                      {/* Rating Stars */}
+                      <div className="mb-4">
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          Rating *
+                        </label>
+                        <div className="flex gap-2">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <button
+                              key={star}
+                              type="button"
+                              onClick={() => handleRatingClick(star)}
+                              className="transition-transform hover:scale-110"
+                            >
+                              <FontAwesomeIcon
+                                icon={faStar}
+                                className={`h-8 w-8 ${
+                                  star <= commentFormData.rating
+                                    ? 'text-yellow-400'
+                                    : 'text-gray-300'
+                                }`}
+                              />
+                            </button>
+                          ))}
+                          {commentFormData.rating > 0 && (
+                            <span className="ml-2 text-gray-600">
+                              {commentFormData.rating}/5
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Comment Text */}
+                      <div className="mb-4">
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          Ulasan Anda *
+                        </label>
+                        <textarea
+                          value={commentFormData.isiKomentar}
+                          onChange={(e) =>
+                            setCommentFormData({
+                              ...commentFormData,
+                              isiKomentar: e.target.value,
+                            })
+                          }
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4C763B] focus:border-transparent"
+                          rows={4}
+                          placeholder="Bagikan pengalaman Anda dengan resep ini... (minimal 5 karakter)"
+                          required
+                          minLength={5}
+                          maxLength={1000}
+                        />
+                        <p className="text-xs text-gray-500 mt-1">
+                          {commentFormData.isiKomentar.length}/1000 karakter
+                        </p>
+                      </div>
+
+                      {/* Submit Buttons */}
+                      <div className="flex gap-3">
+                        <button
+                          type="submit"
+                          disabled={isSubmitting}
+                          className="flex items-center gap-2 px-6 py-3 bg-[#4C763B] text-white rounded-lg hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                        >
+                          <FontAwesomeIcon icon={faPaperPlane} />
+                          {isSubmitting 
+                            ? (isEditMode ? 'Memperbarui...' : 'Mengirim...') 
+                            : (isEditMode ? 'Perbarui Ulasan' : 'Kirim Ulasan')}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setShowCommentForm(false);
+                            setIsEditMode(false);
+                            setCommentFormData({ isiKomentar: '', rating: 0 });
+                          }}
+                          disabled={isSubmitting}
+                          className="px-6 py-3 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 disabled:opacity-50 transition-all"
+                        >
+                          Batal
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                )}
+
+                {/* Comments List */}
+                <div>
+                  <h3 className="text-lg font-bold text-gray-800 mb-4">
+                    Ulasan Pengguna ({komentars.length})
+                  </h3>
+                  
+                  {isLoadingKomentar ? (
+                    <div className="text-center py-8">
+                      <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-[#4C763B] border-r-transparent"></div>
+                      <p className="mt-2 text-gray-600">Memuat ulasan...</p>
+                    </div>
+                  ) : komentars.length === 0 ? (
+                    <div className="text-center py-8 bg-gray-50 rounded-lg">
+                      <FontAwesomeIcon icon={faComment} className="h-12 w-12 text-gray-300 mb-3" />
+                      <p className="text-gray-600">Belum ada ulasan untuk resep ini</p>
+                      <p className="text-sm text-gray-500 mt-1">Jadilah yang pertama memberikan ulasan!</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {komentars.map((komentar) => (
+                        <div
+                          key={komentar.id}
+                          className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
+                        >
+                          <div className="flex items-start gap-4">
+                            {/* Avatar */}
+                            <div className="flex-shrink-0">
+                              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#4C763B] to-[#6a9c4d] flex items-center justify-center text-white font-bold text-lg">
+                                <FontAwesomeIcon icon={faUser} className="h-6 w-6" />
+                              </div>
+                            </div>
+
+                            {/* Content */}
+                            <div className="flex-1">
+                              <div className="flex items-center justify-between mb-2">
+                                <div>
+                                  <p className="font-semibold text-gray-800">
+                                    {/* When Click, redirect to user profile */}
+                                    <a href={`/profile/${komentar.pengguna.id}`} className="hover:underline">
+                                      {komentar.pengguna.nama}
+                                    </a>
+                                  </p>
+                                  <div className="flex items-center gap-2 mt-1">
+                                    <div className="flex">
+                                      {[1, 2, 3, 4, 5].map((star) => (
+                                        <FontAwesomeIcon
+                                          key={star}
+                                          icon={faStar}
+                                          className={`h-4 w-4 ${
+                                            star <= komentar.rating
+                                              ? 'text-yellow-400'
+                                              : 'text-gray-300'
+                                          }`}
+                                        />
+                                      ))}
+                                    </div>
+                                    <span className="text-sm text-gray-600">
+                                      {komentar.rating}/5
+                                    </span>
+                                  </div>
+                                </div>
+                                <p className="text-xs text-gray-500">
+                                  {new Date(komentar.tanggalPosting).toLocaleDateString('id-ID', {
+                                    day: 'numeric',
+                                    month: 'long',
+                                    year: 'numeric',
+                                  })}
+                                </p>
+                              </div>
+                              <p className="text-gray-700 leading-relaxed">
+                                {komentar.isiKomentar}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

@@ -11,4 +11,7 @@ router.patch("/", authenticateToken, ProfileController.updateMe);
 // Riwayat aktivitas pengguna
 router.get("/activity", authenticateToken, ProfileController.getActivity);
 
+// Profil publik user lain (tidak perlu autentikasi)
+router.get("/:userId", ProfileController.getPublicProfile);
+
 export default router;

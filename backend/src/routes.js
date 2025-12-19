@@ -11,6 +11,10 @@ import favoritRoutes from "./routes/favorit.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
 import profileRoutes from "./routes/profile.routes.js";
 import recentSearchRoutes from "./routes/recentSearch.routes.js";
+import analyticsRoutes from "./routes/analytics.routes.js";
+import reportRoutes from "./routes/report.routes.js";
+import artikelRoutes from "./routes/artikel.routes.js";
+import uploadRoutes from "./routes/upload.routes.js";
 
 const router = express.Router();
 
@@ -27,5 +31,17 @@ router.use("/recent-search", recentSearchRoutes);
 
 // Admin routes
 router.use("/admin", adminRoutes);
+
+// Analytics routes
+router.use("/analytics", analyticsRoutes);
+
+// Report routes
+router.use("/report", reportRoutes);
+
+// Artikel routes
+router.use("/artikel", artikelRoutes);
+
+// Upload routes (Admin only)
+router.use("/upload", uploadRoutes);
 
 export default router;

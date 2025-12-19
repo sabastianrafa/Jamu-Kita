@@ -17,4 +17,19 @@ router.post(
   KomentarController.create
 );
 
+// GET /resep/:id/komentar/me - Get current user's comment (ANGGOTA)
+router.get(
+  "/:id/komentar/me",
+  authenticateToken,
+  KomentarController.getUserComment
+);
+
+// PUT /resep/:resepId/komentar/:komentarId - Update comment (ANGGOTA)
+router.put(
+  "/:resepId/komentar/:komentarId",
+  authenticateToken,
+  validate({ body: createKomentarSchema }),
+  KomentarController.update
+);
+
 export default router;

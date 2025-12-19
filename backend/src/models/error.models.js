@@ -14,10 +14,16 @@ export const handleError = (err, req, res, next) => {
         ? err.errors
         : [err.message || 'Internal Server Error'];
     
+    console.error(`Error [${statusCode}]:`, err);
+
     res.status(statusCode).json({
         success: false,
         message: errors.length === 0 ? err.message : "Terjadi beberapa kesalahan.",
         errors: errors,
     });
     // Jangan panggil next() di sini!
+}
+
+export const BadRequestError = (message, errors = []) => {
+    
 }

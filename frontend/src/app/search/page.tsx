@@ -6,6 +6,8 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { saveRecentSearch } from "@/lib/recentSearch";
 import { apiService } from "@/lib/api";
+import { useAnalytics } from "@/hooks/useAnalytics";
+import { trackSearch } from "@/lib/gtag";
 import type { Resep, Kategori, ResepListResponse } from "@/types";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFilter, faXmark } from "@fortawesome/free-solid-svg-icons";
@@ -21,6 +23,7 @@ function SearchContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { isAuthenticated, isLoading } = useAuth();
+  const { trackEvent } = useAnalytics();
   const query = searchParams.get("q") || "";
   const savedSearchRef = useRef<string>("");
   
@@ -87,6 +90,14 @@ function SearchContent() {
             savedSearchRef.current = searchKey;
             try {
               await saveRecentSearch(query, ResultsCount);
+              // Track search with GTAG
+              trackSearch(query, ResultsCount);
+              // Track search with backend analytics
+              await trackEvent('search', {
+                query,
+                resultCount: ResultsCount,
+                filters,
+              });
             } catch (err) {
               console.error("Failed to save recent search:", err);
             }

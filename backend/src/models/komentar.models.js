@@ -9,6 +9,7 @@ export const KomentarModel = {
         user: {
           select: {
             nama: true,
+            id: true,
           },
         },
       },
@@ -21,6 +22,7 @@ export const KomentarModel = {
       rating: k.rating,
       tanggalPosting: k.tanggalPosting.toISOString(),
       pengguna: {
+        id: k.user.id,
         nama: k.user.nama,
       },
     }));
@@ -56,5 +58,72 @@ export const KomentarModel = {
       },
     });
     return count > 0;
+  },
+
+  // Get comment by ID
+  async getById(id) {
+    return await prisma.komentar.findUnique({
+      where: { id },
+      include: {
+        user: {
+          select: {
+            id: true,
+            nama: true,
+          },
+        },
+      },
+    });
+  },
+
+  // Get user's comment for a specific resep
+  async getUserComment(resepId, userId) {
+    const komentar = await prisma.komentar.findFirst({
+      where: {
+        resepId,
+        userId,
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            nama: true,
+          },
+        },
+      },
+    });
+
+    if (!komentar) return null;
+
+    return {
+      id: komentar.id,
+      isiKomentar: komentar.isiKomentar,
+      rating: komentar.rating,
+      tanggalPosting: komentar.tanggalPosting.toISOString(),
+      pengguna: {
+        id: komentar.user.id,
+        nama: komentar.user.nama,
+      },
+    };
+  },
+
+  // Update comment
+  async update(id, data) {
+    const { isiKomentar, rating } = data;
+
+    return await prisma.komentar.update({
+      where: { id },
+      data: {
+        isiKomentar,
+        rating,
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            nama: true,
+          },
+        },
+      },
+    });
   },
 };

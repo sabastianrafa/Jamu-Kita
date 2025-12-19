@@ -70,6 +70,11 @@ export const AuthController = {
         throw new ResponseError(401, "Email atau password salah");
       }
 
+      // Check if user is banned
+      if (user.isBanned) {
+        throw new ResponseError(403, "Akun Anda telah diblokir. Silakan hubungi administrator");
+      }
+
       // Verify password
       const isPasswordValid = await bcrypt.compare(password, user.password);
       if (!isPasswordValid) {

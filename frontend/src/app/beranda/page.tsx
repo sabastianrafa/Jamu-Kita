@@ -62,7 +62,7 @@ export default function HybridPage() {
                 <h3 className="text-base font-bold text-[#29372a] sm:text-lg">
                   Jelajahi Resep Jamu
                 </h3>
-                {selectedCategory && selectedCategory !== "Kesehatan" && (
+                {selectedCategory && selectedCategory !== "All" && (
                   <span className="rounded-full bg-[#4C763B]/10 px-3 py-1 text-xs font-semibold text-[#4C763B]">
                     {selectedCategory}
                   </span>
@@ -70,7 +70,7 @@ export default function HybridPage() {
               </div>
               
               <ResepGridPanel 
-                kategori={selectedCategory === "Kesehatan" ? undefined : selectedCategory}
+                kategori={selectedCategory === "All" ? undefined : selectedCategory}
                 limit={20}
               />
             </section>

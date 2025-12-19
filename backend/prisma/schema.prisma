@@ -13,11 +13,14 @@ model User {
   email         String          @unique
   password      String
   role          UserRole        @default(anggota)
+  isBanned      Boolean         @default(false)
   createdAt     DateTime        @default(now())
   userToken     String?         @db.Text
   komentar      Komentar[]
   favorit       Favorit[]
   recentSearch  RecentSearch[]
+  reportsCreated Report[]       @relation("ReporterReports")
+  reportsReceived Report[]      @relation("ReportedUserReports")
 
   @@map("users")
 }
@@ -91,9 +94,66 @@ model RecentSearch {
   @@map("recent_search")
 }
 
+model AnalyticsEvent {
+  id         Int      @id @default(autoincrement())
+  eventType  String   @db.VarChar(50)  // 'page_view', 'search', 'recipe_view', 'category_view', etc.
+  eventData  String?  @db.Text         // JSON data
+  userId     Int?
+  sessionId  String?  @db.VarChar(255)
+  ipAddress  String?  @db.VarChar(45)
+  userAgent  String?  @db.Text
+  createdAt  DateTime @default(now())
+
+  @@index([eventType])
+  @@index([createdAt])
+  @@index([userId])
+  @@map("analytics_events")
+}
+
 enum UserRole {
   anggota
   admin
 
   @@map("user_role")
+}
+
+model Report {
+  id              Int          @id @default(autoincrement())
+  reporterId      Int
+  reportedUserId  Int
+  reason          String       @db.Text
+  status          ReportStatus @default(pending)
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  reporter        User         @relation("ReporterReports", fields: [reporterId], references: [id], onDelete: Cascade)
+  reportedUser    User         @relation("ReportedUserReports", fields: [reportedUserId], references: [id], onDelete: Cascade)
+
+  @@index([reporterId])
+  @@index([reportedUserId])
+  @@index([status])
+  @@map("reports")
+}
+
+enum ReportStatus {
+  pending
+  reviewed
+  resolved
+  rejected
+}
+
+model Artikel {
+  id               Int      @id @default(autoincrement())
+  judul            String   @db.VarChar(255)
+  konten           String   @db.LongText
+  gambarURL        String?  @db.Text
+  kategori         String   @db.VarChar(100)
+  penulis          String   @db.VarChar(100)
+  tanggalPublikasi DateTime @default(now())
+  views            Int      @default(0)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([kategori])
+  @@index([tanggalPublikasi])
+  @@map("artikel")
 }

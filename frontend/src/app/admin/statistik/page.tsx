@@ -1,59 +1,130 @@
 'use client';
 
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { useEffect, useState } from 'react';
+import { adminApiService } from '@/lib/adminApi';
+import { AdminStats } from '@/types/adminApi.types';
+
+interface DailyVisitor {
+  date: string;
+  visitors: number;
+}
+
+interface Category {
+  name: string;
+  count: number;
+}
+
+interface Recipe {
+  id: string;
+  title: string;
+  count: number;
+}
 
 export default function StatistikPage() {
-  // MODIFIKASI: Data pengunjung harian (30 hari terakhir)
-  const chartData = [
-    { tanggal: 'Sen 1', pengunjung: 245 },
-    { tanggal: 'Sel 2', pengunjung: 312 },
-    { tanggal: 'Rab 3', pengunjung: 289 },
-    { tanggal: 'Kam 4', pengunjung: 401 },
-    { tanggal: 'Jum 5', pengunjung: 478 },
-    { tanggal: 'Sab 6', pengunjung: 523 },
-    { tanggal: 'Min 7', pengunjung: 445 },
-    { tanggal: 'Sen 8', pengunjung: 267 },
-    { tanggal: 'Sel 9', pengunjung: 334 },
-    { tanggal: 'Rab 10', pengunjung: 298 },
-    { tanggal: 'Kam 11', pengunjung: 389 },
-    { tanggal: 'Jum 12', pengunjung: 456 },
-    { tanggal: 'Sab 13', pengunjung: 612 },
-    { tanggal: 'Min 14', pengunjung: 534 },
-    { tanggal: 'Sen 15', pengunjung: 278 },
-    { tanggal: 'Sel 16', pengunjung: 345 },
-    { tanggal: 'Rab 17', pengunjung: 312 },
-    { tanggal: 'Kam 18', pengunjung: 423 },
-    { tanggal: 'Jum 19', pengunjung: 501 },
-    { tanggal: 'Sab 20', pengunjung: 589 },
-    { tanggal: 'Min 21', pengunjung: 498 },
-    { tanggal: 'Sen 22', pengunjung: 289 },
-    { tanggal: 'Sel 23', pengunjung: 367 },
-    { tanggal: 'Rab 24', pengunjung: 334 },
-    { tanggal: 'Kam 25', pengunjung: 412 },
-    { tanggal: 'Jum 26', pengunjung: 489 },
-    { tanggal: 'Sab 27', pengunjung: 578 },
-    { tanggal: 'Min 28', pengunjung: 512 },
-    { tanggal: 'Sen 29', pengunjung: 301 },
-    { tanggal: 'Sel 30', pengunjung: 378 },
-  ];
+  const [stats, setStats] = useState<AdminStats | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Hitung statistik
-  const totalPengunjung = chartData.reduce((sum, data) => sum + data.pengunjung, 0);
-  const rataRataHarian = Math.round(totalPengunjung / chartData.length);
-  const pengunjungTertinggi = Math.max(...chartData.map(d => d.pengunjung));
-  const pengunjungTerendah = Math.min(...chartData.map(d => d.pengunjung));
+  useEffect(() => {
+    fetchStatistics();
+  }, []);
 
-  const kategoriData = [
-    { nama: 'Kesehatan', pencarian: 92, aksi: 'Lihat Konten' },
-    { nama: 'Manfaat', pencarian: 75, aksi: 'Lihat Konten' },
-    { nama: 'Bahan', pencarian: 54, aksi: 'Lihat Konten' },
-  ];
+  const fetchStatistics = async () => {
+    try {
+      const response = await adminApiService.getAnalyticsLogs();
+      if (response.success && response.data) {
+        setStats(response.data);
+      } else {
+        throw new Error(response.message || 'Failed to fetch statistics');
+      }
+    } catch (err) {
+      console.error('Error fetching statistics:', err);
+      setError('Gagal memuat statistik. Menggunakan data contoh.');
+      // Use dummy data as fallback
+      setStats(getDummyData());
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  const jamuData = [
-    { nama: 'Jamu Beras Kencur', pencarian: 154, aksi: 'Cek Konten' },
-    { nama: 'Jamu Temulawak', pencarian: 122, aksi: 'Cek Konten' },
-    { nama: 'Jamu Kunir Madu', pencarian: 96, aksi: 'Cek Konten' },
-  ];
+  const getDummyData = (): AdminStats => {
+    const chartData = [
+      { date: '2024-11-01', visitors: 245 },
+      { date: '2024-11-02', visitors: 312 },
+      { date: '2024-11-03', visitors: 289 },
+      { date: '2024-11-04', visitors: 401 },
+      { date: '2024-11-05', visitors: 478 },
+      { date: '2024-11-06', visitors: 523 },
+      { date: '2024-11-07', visitors: 445 },
+      { date: '2024-11-08', visitors: 267 },
+      { date: '2024-11-09', visitors: 334 },
+      { date: '2024-11-10', visitors: 298 },
+      { date: '2024-11-11', visitors: 389 },
+      { date: '2024-11-12', visitors: 456 },
+      { date: '2024-11-13', visitors: 612 },
+      { date: '2024-11-14', visitors: 534 },
+      { date: '2024-11-15', visitors: 278 },
+      { date: '2024-11-16', visitors: 345 },
+      { date: '2024-11-17', visitors: 312 },
+      { date: '2024-11-18', visitors: 423 },
+      { date: '2024-11-19', visitors: 501 },
+      { date: '2024-11-20', visitors: 589 },
+      { date: '2024-11-21', visitors: 498 },
+      { date: '2024-11-22', visitors: 289 },
+      { date: '2024-11-23', visitors: 367 },
+      { date: '2024-11-24', visitors: 334 },
+      { date: '2024-11-25', visitors: 412 },
+      { date: '2024-11-26', visitors: 489 },
+      { date: '2024-11-27', visitors: 578 },
+      { date: '2024-11-28', visitors: 512 },
+      { date: '2024-11-29', visitors: 301 },
+      { date: '2024-11-30', visitors: 378 },
+    ];
+
+    const totalVisitors = chartData.reduce((sum, data) => sum + data.visitors, 0);
+
+    return {
+      summary: {
+        totalVisitors,
+        averageDaily: Math.round(totalVisitors / chartData.length),
+        highestVisitors: 612,
+        lowestVisitors: 245,
+        period: '30 days',
+      },
+      dailyVisitors: chartData,
+      topCategories: [
+        { name: 'Kesehatan', count: 92 },
+        { name: 'Manfaat', count: 75 },
+        { name: 'Bahan', count: 54 },
+      ],
+      topRecipes: [
+        { id: '1', title: 'Jamu Beras Kencur', count: 154 },
+        { id: '2', title: 'Jamu Temulawak', count: 122 },
+        { id: '3', title: 'Jamu Kunir Madu', count: 96 },
+      ],
+      topSearchTerms: [],
+    };
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const days = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
+    return `${days[date.getDay()]} ${date.getDate()}`;
+  };
+
+  const chartData = stats?.dailyVisitors.map(d => ({
+    tanggal: formatDate(d.date),
+    pengunjung: d.visitors,
+  })) || [];
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-xl">Memuat statistik...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -72,31 +143,37 @@ export default function StatistikPage() {
           STATISTIK PENGUNJUNG
         </h1>
 
-        {/* MODIFIKASI: Statistics Cards - Pengunjung */}
+        {error && (
+          <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+            <p className="text-yellow-700">{error}</p>
+          </div>
+        )}
+
+        {/* Statistics Cards - Pengunjung */}
         <div className="grid grid-cols-4 gap-4 mb-8">
           <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-xl">
             <h3 className="text-sm font-semibold text-gray-600 mb-2">Total Pengunjung</h3>
-            <p className="text-3xl font-bold text-blue-600">{totalPengunjung.toLocaleString()}</p>
+            <p className="text-3xl font-bold text-blue-600">{stats?.summary.totalVisitors.toLocaleString()}</p>
             <p className="text-xs text-gray-500 mt-1">30 hari terakhir</p>
           </div>
           <div className="bg-gradient-to-br from-green-50 to-green-100 p-6 rounded-xl">
             <h3 className="text-sm font-semibold text-gray-600 mb-2">Rata-rata Harian</h3>
-            <p className="text-3xl font-bold text-green-600">{rataRataHarian.toLocaleString()}</p>
+            <p className="text-3xl font-bold text-green-600">{stats?.summary.averageDaily.toLocaleString()}</p>
             <p className="text-xs text-gray-500 mt-1">pengunjung/hari</p>
           </div>
           <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-6 rounded-xl">
             <h3 className="text-sm font-semibold text-gray-600 mb-2">Pengunjung Tertinggi</h3>
-            <p className="text-3xl font-bold text-purple-600">{pengunjungTertinggi.toLocaleString()}</p>
+            <p className="text-3xl font-bold text-purple-600">{stats?.summary.highestVisitors.toLocaleString()}</p>
             <p className="text-xs text-gray-500 mt-1">dalam sehari</p>
           </div>
           <div className="bg-gradient-to-br from-orange-50 to-orange-100 p-6 rounded-xl">
             <h3 className="text-sm font-semibold text-gray-600 mb-2">Pengunjung Terendah</h3>
-            <p className="text-3xl font-bold text-orange-600">{pengunjungTerendah.toLocaleString()}</p>
+            <p className="text-3xl font-bold text-orange-600">{stats?.summary.lowestVisitors.toLocaleString()}</p>
             <p className="text-xs text-gray-500 mt-1">dalam sehari</p>
           </div>
         </div>
 
-        {/* MODIFIKASI: Chart Pengunjung Harian */}
+        {/* Chart Pengunjung Harian */}
         <div className="mb-8">
           <h2 className="text-xl font-bold text-[#B6771D] mb-4" style={{fontFamily: 'Inter'}}>
             Grafik Pengunjung Harian (30 Hari Terakhir)
@@ -133,7 +210,7 @@ export default function StatistikPage() {
             </LineChart>
           </ResponsiveContainer>
           <p className="text-center text-gray-500 mt-2 font-semibold">
-            November 2024
+            {stats?.summary.period} terakhir
           </p>
         </div>
 
@@ -153,11 +230,13 @@ export default function StatistikPage() {
                 </tr>
               </thead>
               <tbody>
-                {kategoriData.map((item, index) => (
+                {stats?.topCategories.map((item, index) => (
                   <tr key={index} className="border-b hover:bg-gray-50">
-                    <td className="p-3">{item.nama}</td>
-                    <td className="p-3">{item.pencarian}</td>
-                    <td className="p-3 text-blue-600 cursor-pointer hover:underline">{item.aksi}</td>
+                    <td className="p-3">{item.name}</td>
+                    <td className="p-3">{item.count}</td>
+                    <td className="p-3">
+                      <button className="text-blue-600 hover:underline">Lihat Konten</button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -178,11 +257,18 @@ export default function StatistikPage() {
                 </tr>
               </thead>
               <tbody>
-                {jamuData.map((item, index) => (
+                {stats?.topRecipes.map((item, index) => (
                   <tr key={index} className="border-b hover:bg-gray-50">
-                    <td className="p-3">{item.nama}</td>
-                    <td className="p-3">{item.pencarian}</td>
-                    <td className="p-3 text-blue-600 cursor-pointer hover:underline">{item.aksi}</td>
+                    <td className="p-3">{item.title}</td>
+                    <td className="p-3">{item.count}</td>
+                    <td className="p-3">
+                      <a 
+                        href={`/resep/${item.id}?dontTrack=true`}
+                        className="text-blue-600 hover:underline"
+                      >
+                        Cek Konten
+                      </a>
+                    </td>
                   </tr>
                 ))}
               </tbody>

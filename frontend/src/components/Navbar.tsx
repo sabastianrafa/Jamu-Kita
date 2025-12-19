@@ -89,7 +89,7 @@ export default function Navbar() {
               href="/sejarah"
               className="font-bold text-[#B6771D] hover:text-[#945d15] transition-colors text-sm lg:text-base whitespace-nowrap"
             >
-              Sejarah
+              Artikel
             </Link>
             <Link
               href="/about-us"
@@ -205,7 +205,7 @@ export default function Navbar() {
             onClick={() => setMenuOpen(false)}
             className="block text-[#B6771D] hover:bg-yellow-200 font-semibold py-3 px-3 rounded-lg transition"
           >
-            Sejarah
+            Artikel
           </Link>
           <Link
             href="/about-us"
@@ -217,15 +217,13 @@ export default function Navbar() {
 
           {isAuthenticated ? (
             <>
-              <a
-                className="rounded-lg text-[#B6771D] hover:bg-yellow-200 font-semibold py-3 px-3 block transition"
-                onClick={() => {
-                  router.push("/profile");
-                  setMenuOpen(false);
-                }}
+              <Link
+                href="/profile"
+                onClick={() => setMenuOpen(false)}
+                className="block text-[#B6771D] hover:bg-yellow-200 font-semibold py-3 px-3 rounded-lg transition"
               >
-                <i className="mr-2 fas fa-user"></i>
-              </a>
+                Profil Saya
+              </Link>
               <button
                 onClick={() => {
                   logout();

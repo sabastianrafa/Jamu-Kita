@@ -1,105 +1,145 @@
 "use client";
 
-import { useState } from "react";
-import { articles, Article } from "@/data/Articles";
+import { useState, useEffect } from "react";
+import { apiService } from "@/lib/api";
+import { ArtikelPopular } from "@/types";
+import { TrendingUp, Search } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function BlogSidebar() {
+  const [popularArtikel, setPopularArtikel] = useState<ArtikelPopular[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [isOpen, setIsOpen] = useState(false);
-  const [activeArticle, setActiveArticle] = useState<Article | null>(null);
+  const router = useRouter();
 
-  const filtered = articles.filter((a) =>
-    a.title.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  useEffect(() => {
+    loadPopularArtikel();
+  }, []);
 
-  const openArticle = (article: Article) => {
-    setActiveArticle(article);
-    setIsOpen(true);
+  const loadPopularArtikel = async () => {
+    try {
+      const response = await apiService.getPopularArtikel(5);
+      if (response.success && response.data) {
+        setPopularArtikel(response.data);
+      }
+    } catch (error) {
+      console.error("Error loading popular artikel:", error);
+    }
+  };
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/sejarah?search=${encodeURIComponent(searchQuery)}`);
+    }
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("id-ID", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
   };
 
   return (
-    <div className="flex flex-col gap-8">
-      {/* Search */}
-      <div className="bg-white p-4 rounded-xl shadow-md">
-        <h3 className="text-lg font-semibold text-[#026301] mb-3">Cari Artikel</h3>
-        <input
-          type="text"
-          placeholder="Ketik kata kunci..."
-          className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-600"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
+    <div className="space-y-6">
+      {/* Search Box */}
+      <div className="bg-white rounded-2xl p-6 shadow-lg">
+        <h3 className="text-lg font-bold text-[#8B4513] mb-4 flex items-center gap-2">
+          <Search size={20} />
+          Cari Artikel
+        </h3>
+        <form onSubmit={handleSearch}>
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Ketik kata kunci..."
+              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B4513]"
+            />
+            <button
+              type="submit"
+              className="px-4 py-2 bg-[#8B4513] text-white rounded-lg hover:bg-[#6d3410] transition-colors"
+            >
+              Cari
+            </button>
+          </div>
+        </form>
+      </div>
 
-        {searchQuery && (
-          <div className="mt-4 flex flex-col gap-3 max-h-96 overflow-y-auto">
-            {filtered.length > 0 ? (
-              filtered.map((article) => (
-                <div
-                  key={article.id}
-                  className="bg-[#FAF8F1] p-3 rounded-lg shadow hover:shadow-md cursor-pointer transition"
-                  onClick={() => openArticle(article)}
-                >
-                  <p className="text-xs text-gray-500">
-                    {article.date} • {article.category}
-                  </p>
-                  <h4 className="font-semibold">{article.title}</h4>
-                  <p className="text-sm text-gray-700">
-                    {article.excerpt.slice(0, 60)}...
-                  </p>
+      {/* Popular Articles */}
+      <div className="bg-white rounded-2xl p-6 shadow-lg">
+        <h3 className="text-lg font-bold text-[#8B4513] mb-4 flex items-center gap-2">
+          <TrendingUp size={20} />
+          Artikel Populer
+        </h3>
+
+        {popularArtikel.length === 0 ? (
+          <p className="text-sm text-gray-500">Belum ada artikel populer</p>
+        ) : (
+          <div className="space-y-4">
+            {popularArtikel.map((artikel, index) => (
+              <Link
+                href={`/sejarah/${artikel.id}`}
+                key={artikel.id}
+                className="flex gap-3 group hover:bg-[#FFFBEA] p-2 rounded-lg transition-colors"
+              >
+                {/* Number Badge */}
+                <div className="flex-shrink-0 w-8 h-8 bg-[#8B4513] text-white rounded-full flex items-center justify-center font-bold text-sm">
+                  {index + 1}
                 </div>
-              ))
-            ) : (
-              <p className="text-gray-500 text-sm mt-2">Tidak ada artikel ditemukan</p>
-            )}
+
+                {/* Content */}
+                <div className="flex-1 min-w-0">
+                  <h4 className="text-sm font-semibold text-[#8B4513] group-hover:text-[#6d3410] line-clamp-2 mb-1">
+                    {artikel.judul}
+                  </h4>
+                  <div className="flex items-center gap-3 text-xs text-gray-500">
+                    <span>{formatDate(artikel.tanggalPublikasi)}</span>
+                    <span>👁️ {artikel.views}</span>
+                  </div>
+                </div>
+
+                {/* Thumbnail */}
+                {artikel.gambarURL && (
+                  <div className="flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden">
+                    <img
+                      src={artikel.gambarURL}
+                      alt={artikel.judul}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                )}
+              </Link>
+            ))}
           </div>
         )}
       </div>
 
-      {/* Top News */}
-      <div className="bg-white p-4 rounded-xl shadow-md">
-        <h3 className="text-lg font-semibold text-[#026301] mb-3">Top News</h3>
-        <div className="flex flex-col gap-3 max-h-[400px] overflow-y-auto">
-          {articles.map((article) => (
-            <div
-              key={article.id}
-              className="flex flex-col gap-1 bg-[#FAF8F1] p-2 rounded-lg shadow hover:shadow-md cursor-pointer transition"
-              onClick={() => openArticle(article)}
+      {/* Category List */}
+      <div className="bg-white rounded-2xl p-6 shadow-lg">
+        <h3 className="text-lg font-bold text-[#8B4513] mb-4">Kategori</h3>
+        <div className="space-y-2">
+          {[
+            "Sejarah",
+            "Kesehatan",
+            "Tradisi",
+            "Tips & Trik",
+            "Berita",
+          ].map((kategori) => (
+            <Link
+              href={`/sejarah?kategori=${kategori}`}
+              key={kategori}
+              className="block px-4 py-2 rounded-lg hover:bg-[#FFFBEA] text-gray-700 hover:text-[#8B4513] transition-colors"
             >
-              <p className="text-xs text-gray-500">
-                {article.date} • {article.category}
-              </p>
-              <h4 className="font-semibold">{article.title}</h4>
-              <p className="text-sm text-gray-700">
-                {article.excerpt.slice(0, 60)}...
-              </p>
-            </div>
+              {kategori}
+            </Link>
           ))}
         </div>
       </div>
-
-      {/* Popup Detail */}
-      {isOpen && activeArticle && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-start z-50 overflow-auto p-4">
-          <div className="relative bg-white rounded-3xl w-full max-w-4xl shadow-lg p-6 mt-20">
-            <button
-              onClick={() => setIsOpen(false)}
-              className="absolute top-5 right-5 text-black text-2xl font-bold hover:text-red-500"
-            >
-              &times;
-            </button>
-            <h2 className="text-3xl font-bold mb-4">{activeArticle.title}</h2>
-
-            <img
-              src={activeArticle.image}
-              className="w-full h-64 object-cover rounded-lg mb-4"
-            />
-
-            <p className="text-lg leading-8">
-              {activeArticle.content || activeArticle.excerpt}
-            </p>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

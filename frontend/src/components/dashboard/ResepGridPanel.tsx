@@ -29,7 +29,7 @@ export default function ResepGridPanel({ kategori, limit = 20 }: ResepGridPanelP
     
     try {
       const response = await apiService.getResepList({
-        kategori: kategori && kategori !== "Kesehatan" ? kategori : undefined,
+        kategori: kategori && kategori !== "All" ? kategori : undefined,
         page: currentPage,
         limit,
       });

@@ -25,9 +25,9 @@ export default function AdminSidebar({ isOpen = true, onClose }: AdminSidebarPro
   const menuItems = [
     { name: 'STATISTIK', path: '/admin/statistik' },
     { name: 'USER', path: '/admin/user' },
-    { name: 'SEJARAH', path: '/admin/sejarah' },
-    { name: 'POSTING', path: '/admin/posting' },
-    { name: 'REPORT', path: '/admin/laporan' },
+    { name: 'ARTIKEL', path: '/admin/artikel' },
+    { name: 'RESEP', path: '/admin/resep' },
+    { name: 'REPORT', path: '/admin/report' },
   ];
   
   const sidebarContent = (
