@@ -1,11 +1,13 @@
 "use client";
 
+import Image from "next/image";
+
 export default function AboutHero() {
   return (
    <section className="relative z-0 w-full py-12 sm:py-16 md:py-20 lg:py-28 px-4 sm:px-6 lg:px-8 bg-white text-[#3B2F0B] overflow-hidden">
       
       {/* Background pattern */}
-      <img
+      <Image
         src="/img/ilustrasi-daun.png"
         className="absolute opacity-10 w-[300px] sm:w-[400px] md:w-[550px] right-0 top-0 pointer-events-none z-0"
         alt="pattern"
@@ -30,7 +32,7 @@ export default function AboutHero() {
 
         {/* Image Section */}
         <div className="flex justify-center">
-          <img
+          <Image
             src="/images/jamu-logo.png"
             alt="Foto Jamu"
             className="w-[280px] sm:w-[320px] md:w-[380px] lg:w-[420px] h-auto rounded-3xl shadow-2xl object-cover border-4 border-white/20 hover:scale-105 transition transform"

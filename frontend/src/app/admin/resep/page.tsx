@@ -2,10 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import { apiService } from '@/lib/api';
-import type { Resep, Kategori, CreateResepData, UpdateResepData } from '@/types';
+import type { Resep, Kategori, CreateResepData } from '@/types';
 import { Plus, Edit2, Trash2, Search, X, Book, Tag } from 'lucide-react';
 import ImageUpload from '@/components/ImageUpload';
 import Pagination from '@/components/Pagination';
+import Image from 'next/image';
 
 const ITEMS_PER_PAGE = 20;
 
@@ -98,6 +99,7 @@ export default function ResepManagementPage() {
       }
     } catch (err) {
       alert('Gagal memuat detail resep');
+      console.error('Error fetching resep detail:', err);
     }
   };
 
@@ -150,6 +152,7 @@ export default function ResepManagementPage() {
           } else {
             throw new Error("Gagal upload gambar");
           }
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (uploadError: any) {
           alert(`Gagal upload gambar: ${uploadError.message}`);
           setSubmitting(false);
@@ -268,7 +271,7 @@ export default function ResepManagementPage() {
     <div className="space-y-6">
       {/* Header Image */}
       <div className="w-full h-32 rounded-2xl overflow-hidden">
-        <img 
+        <Image 
           src="/images/header.png" 
           alt="Herbs Header" 
           className="w-full h-full object-cover"
@@ -368,7 +371,7 @@ export default function ResepManagementPage() {
                     <td className="p-4">
                       <div className="flex items-center gap-3">
                         {resep.gambarURL && (
-                          <img 
+                          <Image 
                             src={resep.gambarURL} 
                             alt={resep.judul}
                             className="w-16 h-16 rounded-lg object-cover"

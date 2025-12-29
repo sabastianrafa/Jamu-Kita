@@ -7,6 +7,13 @@ import { AuthProvider } from "@/context/AuthContext";
 import { useEffect } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { pageview, GA_MEASUREMENT_ID } from "@/lib/gtag";
+import { Elsie } from "next/font/google";
+
+const elsie = Elsie({
+  subsets: ["latin"],
+  weight: ["400", "900"],
+  variable: "--font-elsie",
+});
 
 function AnalyticsTracker() {
   const pathname = usePathname();
@@ -57,7 +64,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="id">
+    <html lang="id" className={elsie.variable}>
       <head>
         <title>Jamu Kita - Herbal Indonesia</title>
         <meta name="description" content="Sehat dengan jamu alami" />
@@ -66,10 +73,6 @@ export default function RootLayout({
           rel="preconnect"
           href="https://fonts.gstatic.com"
           crossOrigin="anonymous"
-        />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Elsie:wght@900&family=Poppins:wght@400;600&family=Inter:wght@400;700&family=Josefin+Sans:ital@0;1&display=swap"
-          rel="stylesheet"
         />
         {/* Google Analytics with consent mode */}
         <script

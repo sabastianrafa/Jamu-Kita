@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState, useCallback } from "react";
 
 export type CarouselImage = {
   src: string;
@@ -60,15 +60,15 @@ export function Carousel({
     setIndex(next);
     onSlideChange?.(next);
   };
-  const next = () => goTo(index + 1);
-  const prev = () => goTo(index - 1);
+  const next = useCallback(() => goTo(index + 1), [index, goTo]);
+  const prev = useCallback(() => goTo(index - 1), [index, goTo]);
 
   useEffect(() => {
     if (!autoPlay || paused || slideCount <= 1) return;
     if (reducedMotion) return;
     const id = setInterval(next, interval);
     return () => clearInterval(id);
-  }, [autoPlay, paused, interval, slideCount, index, reducedMotion]);
+  }, [autoPlay, paused, interval, slideCount, index, reducedMotion, next]);
 
   const containerRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
@@ -100,7 +100,7 @@ export function Carousel({
     const dx = t.clientX - sx;
     const dy = t.clientY - sy;
     const dt = Date.now() - touchTime.current;
-    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 50 && dt < 600) {
+    if ((Math.abs(dx) > Math.abs(dy)) && (Math.abs(dx) > 50) && (dt < 600)) {
       dx < 0 ? next() : prev();
     }
     touchStartX.current = null;

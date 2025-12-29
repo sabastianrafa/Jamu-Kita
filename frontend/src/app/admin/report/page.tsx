@@ -5,6 +5,7 @@ import { adminApiService } from '@/lib/adminApi';
 import type { Report } from '@/types';
 import { AlertTriangle, CheckCircle, XCircle, Ban, User, Calendar } from 'lucide-react';
 import Pagination from '@/components/Pagination';
+import Image from 'next/image';
 
 const ITEMS_PER_PAGE = 40;
 
@@ -13,7 +14,7 @@ export default function AdminReportPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState<number | null>(null);
-  const [filterStatus, setFilterStatus] = useState<'all' | 'pending' | 'reviewed' | 'resolved' | 'rejected'>('all');
+  const [filterStatus, setFilterStatus] = useState<'all' | 'pending' | 'reviewed' | 'resolved' | 'rejected' | string>('all');
   const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
@@ -31,7 +32,8 @@ export default function AdminReportPage() {
       } else {
         setError(response.message || 'Gagal memuat laporan');
       }
-    } catch (err) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err : any) {
       console.error('Error fetching reports:', err);
       setError('Terjadi kesalahan saat memuat laporan');
     } finally {
@@ -54,6 +56,7 @@ export default function AdminReportPage() {
       } else {
         throw new Error(response.message || 'Gagal mem-ban user');
       }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       console.error('Error banning user:', err);
       alert(err.message || 'Terjadi kesalahan saat mem-ban user');
@@ -77,6 +80,7 @@ export default function AdminReportPage() {
       } else {
         throw new Error(response.message || 'Gagal menolak laporan');
       }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       console.error('Error rejecting report:', err);
       alert(err.message || 'Terjadi kesalahan saat menolak laporan');
@@ -134,7 +138,7 @@ export default function AdminReportPage() {
     <div className="space-y-6">
       {/* Header Image */}
       <div className="w-full h-32 rounded-2xl overflow-hidden">
-        <img 
+        <Image
           src="/images/header.png" 
           alt="Herbs Header" 
           className="w-full h-full object-cover"
@@ -213,7 +217,7 @@ export default function AdminReportPage() {
           <label className="block text-sm font-semibold text-gray-700 mb-2">Filter Status:</label>
           <select
             value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value as any)}
+            onChange={(e) => setFilterStatus(e.target.value)}
             className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#B6771D]"
           >
             <option value="all">Semua</option>

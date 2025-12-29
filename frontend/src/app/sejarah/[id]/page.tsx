@@ -6,6 +6,7 @@ import { apiService } from "@/lib/api";
 import { Artikel } from "@/types";
 import { ArrowLeft, Calendar, User, Eye, Tag } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function ArtikelDetailPage() {
   const params = useParams();
@@ -15,28 +16,28 @@ export default function ArtikelDetailPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    const loadArtikel = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const response = await apiService.getArtikelById(Number(params.id));
+        if (response.success && response.data) {
+          setArtikel(response.data);
+        } else {
+          setError("Artikel tidak ditemukan");
+        }
+      } catch (err) {
+        console.error("Error loading artikel:", err);
+        setError("Gagal memuat artikel");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
     if (params.id) {
       loadArtikel();
     }
   }, [params.id]);
-
-  const loadArtikel = async () => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const response = await apiService.getArtikelById(Number(params.id));
-      if (response.success && response.data) {
-        setArtikel(response.data);
-      } else {
-        setError("Artikel tidak ditemukan");
-      }
-    } catch (err) {
-      console.error("Error loading artikel:", err);
-      setError("Gagal memuat artikel");
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -94,7 +95,7 @@ export default function ArtikelDetailPage() {
           {/* Featured Image */}
           {artikel.gambarURL && (
             <div className="w-full h-64 md:h-96 overflow-hidden">
-              <img
+              <Image
                 src={artikel.gambarURL}
                 alt={artikel.judul}
                 className="w-full h-full object-cover"
@@ -151,9 +152,7 @@ export default function ArtikelDetailPage() {
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div className="text-sm text-gray-600">
                   <p>Terakhir diperbarui:</p>
-                  <p className="font-semibold">
-                    {formatDate(artikel.updatedAt)}
-                  </p>
+                  <p className="font-semibold">{formatDate(artikel.updatedAt)}</p>
                 </div>
                 <button
                   onClick={() => router.push("/sejarah")}
@@ -168,9 +167,7 @@ export default function ArtikelDetailPage() {
 
         {/* Share Section (Optional) */}
         <div className="mt-6 bg-white rounded-2xl shadow-lg p-6">
-          <h3 className="text-lg font-bold text-[#8B4513] mb-3">
-            Bagikan Artikel Ini
-          </h3>
+          <h3 className="text-lg font-bold text-[#8B4513] mb-3">Bagikan Artikel Ini</h3>
           <div className="flex gap-3">
             <button
               onClick={() => {

@@ -3,7 +3,6 @@ import TeamSection from "./_components/TeamSection";
 import VisionMission from "./_components/VisionMision"; // Pastikan ejaan file benar (Mision vs Mission)
 import HistorySection from "./_components/HistorySection";
 import BenefitSection from "./_components/BenefitSection";
-import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
 export default function AboutPage() {

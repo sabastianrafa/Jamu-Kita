@@ -98,7 +98,7 @@ export default function CookieConsent() {
                       digunakan untuk statistik pengunjung serta peningkatan layanan.
                     </p>
                     <p className="text-xs text-gray-500 mt-2">
-                      Dengan mengklik "Terima", Anda menyetujui penggunaan cookie kami.
+                      Dengan mengklik &quot;Terima&quot;, Anda menyetujui penggunaan cookie kami.
                       Untuk informasi lebih lanjut, lihat{" "}
                       <a href="/privacy" className="text-[#B6771D] hover:underline">
                         Kebijakan Privasi

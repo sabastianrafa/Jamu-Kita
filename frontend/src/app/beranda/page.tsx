@@ -1,17 +1,13 @@
 "use client";
 
 import Image from "next/image";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { config } from "@fortawesome/fontawesome-svg-core";
 import "@fortawesome/fontawesome-svg-core/styles.css";
-import { faStar } from "@fortawesome/free-solid-svg-icons";
-import Navbar from "@/components/Navbar";
 import BannerSlider from "@/components/dashboard/BannerSlider";
 import CategoryCarousel from "@/components/dashboard/CategoryCarousel";
 import Top7Carousel from "@/components/dashboard/Top7Carousel";
 import RecentSearchCarousel from "@/components/dashboard/RecentSearchCarousel";
 import ResepGridPanel from "@/components/dashboard/ResepGridPanel";
-import ProtectedRoute from "@/components/ProtectedRoute";
 import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 

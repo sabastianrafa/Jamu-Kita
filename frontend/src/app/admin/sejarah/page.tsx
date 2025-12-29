@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useState } from 'react';
 
 // ==========================
@@ -174,7 +175,7 @@ export default function SejarahPage() {
 
       {/* HEADER IMAGE */}
       <div className="w-full h-32 rounded-2xl overflow-hidden">
-        <img 
+        <Image 
           src="/images/header.png"
           alt="Herbs Header" 
           className="w-full h-full object-cover"
@@ -215,7 +216,7 @@ export default function SejarahPage() {
             {articles.length === 0 ? (
               <tr>
                 <td colSpan={6} className="p-8 text-center text-gray-500">
-                  Belum ada artikel. Klik "Tambah Artikel" untuk menambah.
+                  Belum ada artikel. Klik &quot;Tambah Artikel&quot; untuk menambah.
                 </td>
               </tr>
             ) : (
@@ -224,7 +225,7 @@ export default function SejarahPage() {
                   <td className="p-4">{article.id}</td>
                   <td className="p-4">
                     {article.gambar ? (
-                      <img 
+                      <Image 
                         src={article.gambar} 
                         alt={article.judul}
                         className="w-16 h-16 object-cover rounded-lg"
@@ -293,7 +294,7 @@ export default function SejarahPage() {
                   
                   {previewImage ? (
                     <div className="space-y-3">
-                      <img
+                      <Image
                         src={previewImage}
                         alt="Preview"
                         className="max-h-48 mx-auto rounded-lg"

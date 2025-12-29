@@ -42,6 +42,7 @@ export default function RegisterPage() {
         setError(result.message);
       }
     } catch (err) {
+      console.log("Registration error:", err);
       setError("Terjadi kesalahan saat registrasi");
     } finally {
       setIsLoading(false);

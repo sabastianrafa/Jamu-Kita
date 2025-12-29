@@ -2,17 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { apiService } from "@/lib/api";
+import Image from "next/image";
 import { Artikel, CreateArtikelData, UpdateArtikelData } from "@/types";
-import {
-  Plus,
-  Edit2,
-  Trash2,
-  Eye,
-  Calendar,
-  User,
-  Search,
-  X,
-} from "lucide-react";
+import { Plus, Edit2, Trash2, Eye, Calendar, User, Search, X } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import ImageUpload from "@/components/ImageUpload";
@@ -50,11 +42,7 @@ export default function AdminArtikelPage() {
       return;
     }
     loadArtikel();
-  }, [isAuthenticated, user]);
-
-  useEffect(() => {
-    filterArtikel();
-  }, [searchQuery, selectedKategori, artikelList]);
+  }, [isAuthenticated, user, router]);
 
   const loadArtikel = async () => {
     setIsLoading(true);
@@ -71,24 +59,27 @@ export default function AdminArtikelPage() {
     }
   };
 
-  const filterArtikel = () => {
-    let filtered = [...artikelList];
+  useEffect(() => {
+    const filterArtikel = () => {
+      let filtered = [...artikelList];
 
-    if (searchQuery) {
-      filtered = filtered.filter(
-        (a) =>
-          a.judul.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          a.penulis.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
+      if (searchQuery) {
+        filtered = filtered.filter(
+          (a) =>
+            a.judul.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            a.penulis.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+      }
 
-    if (selectedKategori) {
-      filtered = filtered.filter((a) => a.kategori === selectedKategori);
-    }
+      if (selectedKategori) {
+        filtered = filtered.filter((a) => a.kategori === selectedKategori);
+      }
 
-    setFilteredArtikel(filtered);
-    setCurrentPage(1); // Reset to first page on filter change
-  };
+      setFilteredArtikel(filtered);
+      setCurrentPage(1); // Reset to first page on filter change
+    };
+    filterArtikel();
+  }, [searchQuery, selectedKategori, artikelList]);
 
   const handleOpenModal = (artikel?: Artikel) => {
     if (artikel) {
@@ -148,6 +139,7 @@ export default function AdminArtikelPage() {
           } else {
             throw new Error("Gagal upload gambar");
           }
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (uploadError: any) {
           alert(`Gagal upload gambar: ${uploadError.message}`);
           setIsSubmitting(false);
@@ -185,6 +177,7 @@ export default function AdminArtikelPage() {
           throw new Error(response.message);
         }
       }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error("Error submitting artikel:", error);
       alert(error.message || "Terjadi kesalahan saat menyimpan artikel");
@@ -206,6 +199,7 @@ export default function AdminArtikelPage() {
       } else {
         throw new Error(response.message);
       }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error("Error deleting artikel:", error);
       alert(error.message || "Terjadi kesalahan saat menghapus artikel");
@@ -232,12 +226,8 @@ export default function AdminArtikelPage() {
         <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">
-                Manajemen Artikel
-              </h1>
-              <p className="text-gray-600 mt-1">
-                Kelola artikel dan blog Jamu Kita
-              </p>
+              <h1 className="text-3xl font-bold text-gray-900">Manajemen Artikel</h1>
+              <p className="text-gray-600 mt-1">Kelola artikel dan blog Jamu Kita</p>
             </div>
             <button
               onClick={() => handleOpenModal()}
@@ -281,28 +271,18 @@ export default function AdminArtikelPage() {
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
           <div className="bg-white rounded-2xl shadow-lg p-6">
-            <h3 className="text-gray-600 text-sm font-semibold mb-2">
-              Total Artikel
-            </h3>
-            <p className="text-3xl font-bold text-[#8B4513]">
-              {artikelList.length}
-            </p>
+            <h3 className="text-gray-600 text-sm font-semibold mb-2">Total Artikel</h3>
+            <p className="text-3xl font-bold text-[#8B4513]">{artikelList.length}</p>
           </div>
           <div className="bg-white rounded-2xl shadow-lg p-6">
-            <h3 className="text-gray-600 text-sm font-semibold mb-2">
-              Total Views
-            </h3>
+            <h3 className="text-gray-600 text-sm font-semibold mb-2">Total Views</h3>
             <p className="text-3xl font-bold text-[#8B4513]">
               {artikelList.reduce((sum, a) => sum + a.views, 0)}
             </p>
           </div>
           <div className="bg-white rounded-2xl shadow-lg p-6">
-            <h3 className="text-gray-600 text-sm font-semibold mb-2">
-              Artikel Terfilter
-            </h3>
-            <p className="text-3xl font-bold text-[#8B4513]">
-              {filteredArtikel.length}
-            </p>
+            <h3 className="text-gray-600 text-sm font-semibold mb-2">Artikel Terfilter</h3>
+            <p className="text-3xl font-bold text-[#8B4513]">{filteredArtikel.length}</p>
           </div>
         </div>
 
@@ -313,9 +293,7 @@ export default function AdminArtikelPage() {
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#8B4513]"></div>
             </div>
           ) : filteredArtikel.length === 0 ? (
-            <div className="text-center py-12 text-gray-500">
-              Tidak ada artikel ditemukan
-            </div>
+            <div className="text-center py-12 text-gray-500">Tidak ada artikel ditemukan</div>
           ) : (
             <>
               <div className="overflow-x-auto">
@@ -346,85 +324,83 @@ export default function AdminArtikelPage() {
                     {filteredArtikel
                       .slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE)
                       .map((artikel) => (
-                    <tr
-                      key={artikel.id}
-                      className="hover:bg-gray-50 transition-colors"
-                    >
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-3">
-                          {artikel.gambarURL && (
-                            <img
-                              src={artikel.gambarURL}
-                              alt={artikel.judul}
-                              className="w-16 h-16 rounded-lg object-cover"
-                            />
-                          )}
-                          <div className="max-w-md">
-                            <p className="font-semibold text-gray-900 line-clamp-1">
-                              {artikel.judul}
-                            </p>
-                            <p className="text-sm text-gray-600 line-clamp-2">
-                              {artikel.konten.replace(/<[^>]*>/g, "").substring(0, 100)}...
-                            </p>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <span className="inline-block px-3 py-1 bg-[#8B4513] text-white text-xs rounded-full">
-                          {artikel.kategori}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-600">
-                        <div className="flex items-center gap-1">
-                          <User size={14} />
-                          {artikel.penulis}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-600">
-                        <div className="flex items-center gap-1">
-                          <Calendar size={14} />
-                          {formatDate(artikel.tanggalPublikasi)}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-600">
-                        <div className="flex items-center gap-1">
-                          <Eye size={14} />
-                          {artikel.views}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center justify-center gap-2">
-                          <button
-                            onClick={() => handleOpenModal(artikel)}
-                            className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                            title="Edit"
-                          >
-                            <Edit2 size={18} />
-                          </button>
-                          <button
-                            onClick={() => handleDelete(artikel.id)}
-                            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                            title="Hapus"
-                          >
-                            <Trash2 size={18} />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                        <tr key={artikel.id} className="hover:bg-gray-50 transition-colors">
+                          <td className="px-6 py-4">
+                            <div className="flex items-center gap-3">
+                              {artikel.gambarURL && (
+                                <Image
+                                  src={artikel.gambarURL}
+                                  alt={artikel.judul}
+                                  className="w-16 h-16 rounded-lg object-cover"
+                                />
+                              )}
+                              <div className="max-w-md">
+                                <p className="font-semibold text-gray-900 line-clamp-1">
+                                  {artikel.judul}
+                                </p>
+                                <p className="text-sm text-gray-600 line-clamp-2">
+                                  {artikel.konten.replace(/<[^>]*>/g, "").substring(0, 100)}
+                                  ...
+                                </p>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className="inline-block px-3 py-1 bg-[#8B4513] text-white text-xs rounded-full">
+                              {artikel.kategori}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 text-sm text-gray-600">
+                            <div className="flex items-center gap-1">
+                              <User size={14} />
+                              {artikel.penulis}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 text-sm text-gray-600">
+                            <div className="flex items-center gap-1">
+                              <Calendar size={14} />
+                              {formatDate(artikel.tanggalPublikasi)}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 text-sm text-gray-600">
+                            <div className="flex items-center gap-1">
+                              <Eye size={14} />
+                              {artikel.views}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="flex items-center justify-center gap-2">
+                              <button
+                                onClick={() => handleOpenModal(artikel)}
+                                className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                title="Edit"
+                              >
+                                <Edit2 size={18} />
+                              </button>
+                              <button
+                                onClick={() => handleDelete(artikel.id)}
+                                className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                title="Hapus"
+                              >
+                                <Trash2 size={18} />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                  </tbody>
+                </table>
+              </div>
 
-            {/* Pagination */}
-            <Pagination
-              currentPage={currentPage}
-              totalPages={Math.ceil(filteredArtikel.length / ITEMS_PER_PAGE)}
-              onPageChange={setCurrentPage}
-              itemsPerPage={ITEMS_PER_PAGE}
-              totalItems={filteredArtikel.length}
-            />
-          </>
+              {/* Pagination */}
+              <Pagination
+                currentPage={currentPage}
+                totalPages={Math.ceil(filteredArtikel.length / ITEMS_PER_PAGE)}
+                onPageChange={setCurrentPage}
+                itemsPerPage={ITEMS_PER_PAGE}
+                totalItems={filteredArtikel.length}
+              />
+            </>
           )}
         </div>
       </div>
@@ -447,15 +423,11 @@ export default function AdminArtikelPage() {
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Judul *
-                </label>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Judul *</label>
                 <input
                   type="text"
                   value={formData.judul}
-                  onChange={(e) =>
-                    setFormData({ ...formData, judul: e.target.value })
-                  }
+                  onChange={(e) => setFormData({ ...formData, judul: e.target.value })}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B4513]"
                   required
                   minLength={5}
@@ -464,22 +436,16 @@ export default function AdminArtikelPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Konten *
-                </label>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Konten *</label>
                 <textarea
                   value={formData.konten}
-                  onChange={(e) =>
-                    setFormData({ ...formData, konten: e.target.value })
-                  }
+                  onChange={(e) => setFormData({ ...formData, konten: e.target.value })}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B4513]"
                   rows={10}
                   required
                   minLength={50}
                 />
-                <p className="text-xs text-gray-500 mt-1">
-                  Minimal 50 karakter
-                </p>
+                <p className="text-xs text-gray-500 mt-1">Minimal 50 karakter</p>
               </div>
 
               <div>
@@ -503,9 +469,7 @@ export default function AdminArtikelPage() {
                   </label>
                   <select
                     value={formData.kategori}
-                    onChange={(e) =>
-                      setFormData({ ...formData, kategori: e.target.value })
-                    }
+                    onChange={(e) => setFormData({ ...formData, kategori: e.target.value })}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B4513]"
                     required
                   >
@@ -524,9 +488,7 @@ export default function AdminArtikelPage() {
                   <input
                     type="text"
                     value={formData.penulis}
-                    onChange={(e) =>
-                      setFormData({ ...formData, penulis: e.target.value })
-                    }
+                    onChange={(e) => setFormData({ ...formData, penulis: e.target.value })}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B4513]"
                     required
                     minLength={2}

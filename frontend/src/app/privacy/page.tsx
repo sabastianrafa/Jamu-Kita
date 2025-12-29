@@ -81,7 +81,7 @@ export default function PrivacyPage() {
               </p>
               <p className="mt-4">
                 <strong>Opt-out:</strong> Anda dapat menolak penggunaan cookie dengan memilih
-                pengaturan yang sesuai di browser Anda atau dengan mengklik tombol "Tolak" di banner
+                pengaturan yang sesuai di browser Anda atau dengan mengklik tombol &quot;Tolak&quot; di banner
                 cookie kami.
               </p>
             </section>

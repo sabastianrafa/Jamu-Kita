@@ -27,6 +27,11 @@ export default function LoginPage() {
   const { login, isAuthenticated } = useAuth();
   const router = useRouter();
 
+  if (isAuthenticated) {
+    router.push("/beranda");
+    return null;
+  }
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError("");
@@ -41,6 +46,7 @@ export default function LoginPage() {
         setError(result.message);
       }
     } catch (err) {
+      console.error("Login error:", err);
       setError("Terjadi kesalahan saat login");
     } finally {
       setIsLoading(false);

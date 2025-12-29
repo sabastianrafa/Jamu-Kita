@@ -1,5 +1,7 @@
 "use client";
 
+import Image from "next/image";
+
 export default function TeamSection() {
   const team = [
     { name: "Irani Lutfiani Putri", role: "Project Manager & UI/UX Designer", img: "https://infokalteng.co/foto_berita/135642-dbb76965-0732-4b1b-bbe2-cbea751844c6.jpeg" },
@@ -18,7 +20,7 @@ export default function TeamSection() {
             key={index}
             className="bg-white p-4 sm:p-5 rounded-2xl shadow-lg text-center hover:scale-105 transition-all"
           >
-            <img
+            <Image
               src={person.img}
               alt={person.name}
               className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 mx-auto rounded-full object-cover mb-3 sm:mb-4 shadow-md"

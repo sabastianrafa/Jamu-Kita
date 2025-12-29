@@ -32,16 +32,6 @@ export default function ResepDetailPage() {
 
   const dontTrack = useSearchParams().get("dontTrack") === "true";
 
-  useEffect(() => {
-    if (!hasLoaded.current) {
-      hasLoaded.current = true;
-      if (params.id) {
-        fetchResepDetail(params.id as string);
-        fetchKomentars(params.id as string);
-      }
-    }
-  }, [params.id]);
-
   const fetchResepDetail = async (id: string) => {
     
     setIsLoading(true);
@@ -95,6 +85,16 @@ export default function ResepDetailPage() {
       setIsLoadingKomentar(false);
     }
   };
+
+  useEffect(() => {
+    if (!hasLoaded.current) {
+      hasLoaded.current = true;
+      if (params.id) {
+        fetchResepDetail(params.id as string);
+        fetchKomentars(params.id as string);
+      }
+    }
+  }, [params.id, fetchResepDetail, fetchKomentars]);
 
   const handleRatingClick = (rating: number) => {
     if (!apiService.getStoredToken()) {

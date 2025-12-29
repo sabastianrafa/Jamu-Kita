@@ -5,6 +5,7 @@ import { apiService } from '@/lib/api';
 import type { AdminUser } from '@/types';
 import { Trash2, Search, UserCheck, Shield, User as UserIcon } from 'lucide-react';
 import Pagination from '@/components/Pagination';
+import Image from 'next/image';
 
 const ITEMS_PER_PAGE = 30;
 
@@ -105,7 +106,7 @@ export default function UserPage() {
     <div className="space-y-6">
       {/* Header Image */}
       <div className="w-full h-32 rounded-2xl overflow-hidden">
-        <img 
+        <Image 
            src="/images/header.png"
           alt="Herbs Header" 
           className="w-full h-full object-cover"
@@ -294,7 +295,7 @@ export default function UserPage() {
         {/* Info Note */}
         <div className="mt-6 bg-yellow-50 border-l-4 border-yellow-400 p-4">
           <p className="text-yellow-800 text-sm">
-            <strong>Catatan:</strong> Akun admin tidak dapat dihapus. Anda hanya dapat menghapus akun dengan role "Anggota".
+            <strong>Catatan:</strong> Akun admin tidak dapat dihapus. Anda hanya dapat menghapus akun dengan role &quot;Anggota&quot;.
           </p>
         </div>
       </div>

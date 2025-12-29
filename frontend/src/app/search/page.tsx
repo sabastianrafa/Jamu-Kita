@@ -8,15 +8,15 @@ import { saveRecentSearch } from "@/lib/recentSearch";
 import { apiService } from "@/lib/api";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import { trackSearch } from "@/lib/gtag";
-import type { Resep, Kategori, ResepListResponse } from "@/types";
+import type { Resep, Kategori } from "@/types";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFilter, faXmark } from "@fortawesome/free-solid-svg-icons";
 
 interface SearchFilters {
   kategoriId?: string;
   minRating?: string;
-  sortBy?: "createdAt" | "rating" | "judul";
-  sortOrder?: "asc" | "desc";
+  sortBy?: "createdAt" | "rating" | "judul" | string;
+  sortOrder?: "asc" | "desc" | string;
 }
 
 function SearchContent() {
@@ -116,7 +116,7 @@ function SearchContent() {
     };
 
     performSearch();
-  }, [query, filters, isAuthenticated, isLoading]);
+  }, [query, filters, isAuthenticated, isLoading, trackEvent]);
 
   const handleFilterChange = (newFilters: Partial<SearchFilters>) => {
     setFilters((prev) => ({ ...prev, ...newFilters }));
@@ -153,7 +153,7 @@ function SearchContent() {
       {/* Header */}
       <div className="mb-6">
         <h2 className="text-2xl md:text-3xl font-bold text-[#29372a] mb-2">
-          Hasil Pencarian: <span className="text-[#B6771D]">"{query}"</span>
+          Hasil Pencarian: <span className="text-[#B6771D]">&quot;{query}&quot;</span>
         </h2>
         <p className="text-gray-600">
           {loading ? "Mencari resep jamu..." : `${results.length} resep ditemukan`}
@@ -245,8 +245,8 @@ function SearchContent() {
                 onChange={(e) => {
                   const [sortBy, sortOrder] = e.target.value.split("-");
                   handleFilterChange({
-                    sortBy: sortBy as any,
-                    sortOrder: sortOrder as any,
+                    sortBy: sortBy,
+                    sortOrder: sortOrder,
                   });
                 }}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B6771D] bg-white"
@@ -316,7 +316,7 @@ function SearchContent() {
             Tidak Ada Hasil Ditemukan
           </h3>
           <p className="text-gray-600 mb-6 max-w-md mx-auto">
-            Tidak ada resep jamu yang cocok dengan kata kunci <strong>"{query}"</strong>
+            Tidak ada resep jamu yang cocok dengan kata kunci <strong>&quot;{query}&quot;</strong>
             {hasActiveFilters && " dan filter yang dipilih"}
           </p>
           
@@ -325,7 +325,7 @@ function SearchContent() {
             <ul className="text-left text-sm text-gray-600 space-y-2">
               <li className="flex items-start gap-2">
                 <span className="text-[#B6771D] font-bold">•</span>
-                <span>Coba kata kunci yang lebih umum (misalnya: "kunyit" bukan "kunyit asem")</span>
+                <span>Coba kata kunci yang lebih umum (misalnya: &quot;kunyit&quot; bukan &quot;kunyit asem&quot;)</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-[#B6771D] font-bold">•</span>

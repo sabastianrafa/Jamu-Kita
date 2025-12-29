@@ -2,7 +2,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Elsie } from "next/font/google";
-import Navbar from "@/components/Navbar";
 
 const elsie = Elsie({ subsets: ["latin"], weight: ["400", "900"] });
 
@@ -179,7 +178,7 @@ export default function Home() {
       </section>
       <div className="w-full h-auto py-3 sm:py-4 md:h-[50px] flex items-center justify-center bg-gradient-to-r from-[#FFF79C] via-[#FFEFA7] to-[#F6C986] rounded-full px-2 sm:px-4 shadow-[0_6px_18px_rgba(0,0,0,0.06)]">
         {/* Left icon - hidden on mobile */}
-        <img
+        <Image
           src="/images/cup.png"
           alt=""
           className="hidden sm:block h-20 w-20 md:h-28 md:w-28 lg:h-32 lg:w-32 object-contain drop-shadow-[0_2px_6px_rgba(0,0,0,0.15)] transform scale-x-[-1]"
@@ -189,7 +188,7 @@ export default function Home() {
         <div className="flex-1 h-[1.2px] bg-gradient-to-r from-transparent via-[#C6A34D]/70 to-[#C6A34D]/90 mx-2 sm:mx-3 md:mx-4" />
 
         {/* Center logo */}
-        <img
+        <Image
           src="/images/jamu-logo.png"
           alt="Logo Jamu"
           className="h-6 w-6 sm:h-8 sm:w-8 md:h-9 md:w-9 object-contain drop-shadow-[0_2px_6px_rgba(0,0,0,0.15)]"
@@ -199,7 +198,7 @@ export default function Home() {
         <div className="flex-1 h-[1.2px] bg-gradient-to-l from-transparent via-[#C6A34D]/70 to-[#C6A34D]/90 mx-2 sm:mx-3 md:mx-4" />
 
         {/* Right icon - hidden on mobile */}
-        <img
+        <Image
           src="/images/cup.png"
           alt=""
           className="hidden sm:block h-20 w-20 md:h-28 md:w-28 lg:h-32 lg:w-32 object-contain drop-shadow-[0_2px_6px_rgba(0,0,0,0.15)]"

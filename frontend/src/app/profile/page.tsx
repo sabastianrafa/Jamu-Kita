@@ -10,8 +10,7 @@ import SavedList from "@/components/profile/SavedList";
 import ReviewsList from "@/components/profile/ReviewsList";
 import { useAuth } from "@/context/AuthContext";
 import { apiService } from "@/lib/api";
-import type { ActivityHistory, Resep, PublicProfileData, User } from "@/types";
-import { useState as useModalState } from "react";
+import type { ActivityHistory, Resep, PublicProfileData} from "@/types";
 import { adminApiService } from "@/lib/adminApi";
 
 export default function ProfilePage() {
@@ -145,6 +144,7 @@ export default function ProfilePage() {
       } else {
         throw new Error(response.message || "Gagal mengirim laporan");
       }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       console.error("Error submitting report:", err);
       alert(err.message || "Terjadi kesalahan saat mengirim laporan");
@@ -209,7 +209,7 @@ export default function ProfilePage() {
               setActiveTab={setLeftTab}
               user={
                 isViewingOtherProfile && publicProfileData
-                  ? (publicProfileData.user as any)
+                  ? publicProfileData.user
                   : user
               }
               savedCount={favorites.length}
