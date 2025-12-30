@@ -15,7 +15,7 @@ import { faFilter, faXmark } from "@fortawesome/free-solid-svg-icons";
 interface SearchFilters {
   kategoriId?: string;
   minRating?: string;
-  sortBy?: "createdAt" | "rating" | "judul" | string;
+  sortBy?: "createdAt" | "rating" | "judul" | string | undefined;
   sortOrder?: "asc" | "desc" | string;
 }
 

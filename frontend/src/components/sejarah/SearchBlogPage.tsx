@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import NavbarDashboard from "@/components/dashboard/Navbardashboard";
+import Navbar from "@/components/Navbar";
 
 interface Article {
   id: number;
@@ -62,7 +62,7 @@ export default function SearchBlogPage({ search }: { search: string }) {
 
   return (
     <div className="min-h-screen bg-[#FFFBEA]">
-      <NavbarDashboard />
+      <Navbar />
       <div className="pt-32 px-8">
         <h2 className="text-2xl font-bold mb-6">Hasil Pencarian: "{query}"</h2>
 

@@ -44,8 +44,8 @@ export interface SearchResepParams {
   keyword?: string;
   kategoriId?: string | number;
   minRating?: string | number;
-  sortBy?: "createdAt" | "rating" | "judul";
-  sortOrder?: "asc" | "desc";
+  sortBy?: "createdAt" | "rating" | "judul" | string | undefined;
+  sortOrder?: "asc" | "desc" | string;
   page?: number;
   limit?: number;
 }

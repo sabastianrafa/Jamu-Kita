@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { apiService } from "@/lib/api";
-import type { Resep } from "@/types";
+import type { Resep, ResepListResponse } from "@/types";
 import ResepCard from "./ResepCard";
 import { useRouter } from "next/navigation";
 

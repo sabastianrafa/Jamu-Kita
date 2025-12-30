@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { apiService } from '@/lib/api';
-import type { Resep, Kategori, CreateResepData } from '@/types';
+import type { Resep, Kategori, CreateResepData, ResepListResponse } from '@/types';
 import { Plus, Edit2, Trash2, Search, X, Book, Tag } from 'lucide-react';
 import ImageUpload from '@/components/ImageUpload';
 import Pagination from '@/components/Pagination';
@@ -49,7 +49,7 @@ export default function ResepManagementPage() {
       ]);
       
       if (resepResponse.success && resepResponse.data) {
-        setReseps(resepResponse.data);
+        setReseps(resepResponse.data.data);
       }
       
       if (kategoriResponse.success && kategoriResponse.data) {

@@ -144,7 +144,7 @@ class ApiService {
   }
 
   // Resep endpoints
-  async getResepList(params?: GetResepParams): Promise<ApiResponse<Resep[]>> {
+  async getResepList(params?: GetResepParams): Promise<ApiResponse<ResepListResponse>> {
     try {
       const queryParams = new URLSearchParams();
       if (params?.q) queryParams.append("q", params.q);
