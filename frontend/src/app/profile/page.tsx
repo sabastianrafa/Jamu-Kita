@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import ProfileTabs from "@/components/profile/ProfileTabs";
 import ProfileCard from "@/components/profile/ProfileCard";
@@ -13,7 +13,7 @@ import { apiService } from "@/lib/api";
 import type { ActivityHistory, Resep, PublicProfileData} from "@/types";
 import { adminApiService } from "@/lib/adminApi";
 
-export default function ProfilePage() {
+function ProfileContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { isAuthenticated, isLoading, user, refreshProfile } = useAuth();
@@ -311,5 +311,22 @@ export default function ProfilePage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function ProfilePage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-[#F5F5F5] flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#B6771D] mx-auto"></div>
+            <p className="mt-4 text-gray-600">Loading...</p>
+          </div>
+        </div>
+      }
+    >
+      <ProfileContent />
+    </Suspense>
   );
 }
