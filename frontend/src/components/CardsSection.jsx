@@ -118,7 +118,9 @@ export default function CardsSection() {
                 <div className={`${card.position === "right" ? "md:order-1" : "md:order-2"} order-2`}>
                   <div className="flex justify-center">
                     <div className="w-48 h-48 sm:w-56 sm:h-56 md:w-64 md:h-64 bg-[#026301] rounded-full flex items-center justify-center shadow-xl">
-                      <Image 
+                      <Image
+                        width={300}
+                        height={0} 
                         src={card.image}
                         alt={card.title}
                         className="w-40 h-40 sm:w-48 sm:h-48 md:w-56 md:h-56 rounded-full object-cover"

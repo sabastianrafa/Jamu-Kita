@@ -181,6 +181,8 @@ export default function Home() {
         <Image
           src="/images/cup.png"
           alt=""
+          width={28}
+          height={20}
           className="hidden sm:block h-20 w-20 md:h-28 md:w-28 lg:h-32 lg:w-32 object-contain drop-shadow-[0_2px_6px_rgba(0,0,0,0.15)] transform scale-x-[-1]"
         />
 
@@ -191,6 +193,8 @@ export default function Home() {
         <Image
           src="/images/jamu-logo.png"
           alt="Logo Jamu"
+          width={6}
+          height={8}
           className="h-6 w-6 sm:h-8 sm:w-8 md:h-9 md:w-9 object-contain drop-shadow-[0_2px_6px_rgba(0,0,0,0.15)]"
         />
 
@@ -201,6 +205,8 @@ export default function Home() {
         <Image
           src="/images/cup.png"
           alt=""
+          width={28}
+          height={20}
           className="hidden sm:block h-20 w-20 md:h-28 md:w-28 lg:h-32 lg:w-32 object-contain drop-shadow-[0_2px_6px_rgba(0,0,0,0.15)]"
         />
       </div>

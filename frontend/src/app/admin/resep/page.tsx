@@ -273,7 +273,9 @@ export default function ResepManagementPage() {
       <div className="w-full h-32 rounded-2xl overflow-hidden">
         <Image 
           src="/images/header.png" 
-          alt="Herbs Header" 
+          alt="Herbs Header"
+          width={1200}
+          height={0}
           className="w-full h-full object-cover"
         />
       </div>
@@ -374,6 +376,8 @@ export default function ResepManagementPage() {
                           <Image 
                             src={resep.gambarURL} 
                             alt={resep.judul}
+                            width={64}
+                            height={0}
                             className="w-16 h-16 rounded-lg object-cover"
                           />
                         )}

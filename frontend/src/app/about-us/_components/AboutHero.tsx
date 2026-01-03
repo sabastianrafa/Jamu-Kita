@@ -9,6 +9,8 @@ export default function AboutHero() {
       {/* Background pattern */}
       <Image
         src="/img/ilustrasi-daun.png"
+        width={550}
+        height={0}
         className="absolute opacity-10 w-[300px] sm:w-[400px] md:w-[550px] right-0 top-0 pointer-events-none z-0"
         alt="pattern"
       />
@@ -35,6 +37,8 @@ export default function AboutHero() {
           <Image
             src="/images/jamu-logo.png"
             alt="Foto Jamu"
+            width={420}
+            height={0}
             className="w-[280px] sm:w-[320px] md:w-[380px] lg:w-[420px] h-auto rounded-3xl shadow-2xl object-cover border-4 border-white/20 hover:scale-105 transition transform"
           />
         </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, Suspense } from "react";
+import { useState, useEffect, useRef, Suspense, useCallback } from "react";
 import JamuCard from "@/components/dashboard/JamuCard";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
@@ -26,6 +26,7 @@ function SearchContent() {
   const { trackEvent } = useAnalytics();
   const query = searchParams.get("q") || "";
   const savedSearchRef = useRef<string>("");
+  const isSearching = useRef(false);
   
   const [results, setResults] = useState<Resep[]>([]);
   const [loading, setLoading] = useState(false);
@@ -66,8 +67,16 @@ function SearchContent() {
   useEffect(() => {
     if (!query || !isAuthenticated || isLoading) return;
 
+    const searchKey = `${query}-${JSON.stringify(filters)}`;
+    
+    // Prevent duplicate searches
+    if (savedSearchRef.current === searchKey || isSearching.current) {
+      return;
+    }
+
     const performSearch = async () => {
       try {
+        isSearching.current = true;
         setLoading(true);
         setError(null);
 
@@ -83,26 +92,25 @@ function SearchContent() {
         });
 
         if (response.success && response.data) {
-          // Save to recent search - only if not already saved for this query
+          savedSearchRef.current = searchKey;
           const ResultsCount = response.data.length;
-          const searchKey = `${query}-${JSON.stringify(filters)}`;
-          if (savedSearchRef.current !== searchKey) {
-            savedSearchRef.current = searchKey;
-            try {
-              await saveRecentSearch(query, ResultsCount);
-              // Track search with GTAG
-              trackSearch(query, ResultsCount);
-              // Track search with backend analytics
-              await trackEvent('search', {
-                query,
-                resultCount: ResultsCount,
-                filters,
-              });
-            } catch (err) {
-              console.error("Failed to save recent search:", err);
-            }
-          }
+          
           setResults(response.data);
+          
+          // Save to recent search and track analytics in background
+          try {
+            await saveRecentSearch(query, ResultsCount);
+            // Track search with GTAG
+            trackSearch(query, ResultsCount);
+            // Track search with backend analytics
+            trackEvent('search', {
+              query,
+              resultCount: ResultsCount,
+              filters,
+            });
+          } catch (err) {
+            console.error("Failed to save recent search:", err);
+          }
         } else {
           throw new Error(response.message || "Gagal melakukan pencarian");
         }
@@ -112,11 +120,12 @@ function SearchContent() {
         setResults([]);
       } finally {
         setLoading(false);
+        isSearching.current = false;
       }
     };
 
     performSearch();
-  }, [query, filters, isAuthenticated, isLoading, trackEvent]);
+  }, [query, filters, isAuthenticated, isLoading]);
 
   const handleFilterChange = (newFilters: Partial<SearchFilters>) => {
     setFilters((prev) => ({ ...prev, ...newFilters }));

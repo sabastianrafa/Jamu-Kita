@@ -98,6 +98,8 @@ export default function ArtikelDetailPage() {
               <Image
                 src={artikel.gambarURL}
                 alt={artikel.judul}
+                width={800}
+                height={0}
                 className="w-full h-full object-cover"
               />
             </div>

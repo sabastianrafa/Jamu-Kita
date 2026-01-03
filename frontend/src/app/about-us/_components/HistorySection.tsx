@@ -10,6 +10,8 @@ export default function HistorySection() {
         <Image
           src="/images/jamu1.jpg"
           alt="Sejarah Jamu Kita"
+          width={800}
+          height={0}
           className="rounded-2xl shadow-xl w-full h-64 sm:h-80 md:h-auto object-cover hover:scale-105 transition"
         />
 

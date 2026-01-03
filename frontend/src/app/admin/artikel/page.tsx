@@ -331,6 +331,8 @@ export default function AdminArtikelPage() {
                                 <Image
                                   src={artikel.gambarURL}
                                   alt={artikel.judul}
+                                  width={64}
+                                  height={0}
                                   className="w-16 h-16 rounded-lg object-cover"
                                 />
                               )}

@@ -23,6 +23,8 @@ export default function TeamSection() {
             <Image
               src={person.img}
               alt={person.name}
+              width={128}
+              height={0}
               className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 mx-auto rounded-full object-cover mb-3 sm:mb-4 shadow-md"
             />
             <h3 className="text-base sm:text-lg md:text-xl font-bold px-2">{person.name}</h3>

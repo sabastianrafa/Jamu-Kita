@@ -140,7 +140,9 @@ export default function AdminReportPage() {
       <div className="w-full h-32 rounded-2xl overflow-hidden">
         <Image
           src="/images/header.png" 
-          alt="Herbs Header" 
+          alt="Herbs Header"
+          width={1200}
+          height={0}
           className="w-full h-full object-cover"
         />
       </div>
