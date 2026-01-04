@@ -20,6 +20,7 @@ export const handleError = (err, req, res, next) => {
         success: false,
         message: errors.length === 0 ? err.message : "Terjadi beberapa kesalahan.",
         errors: errors,
+        err
     });
     // Jangan panggil next() di sini!
 }
