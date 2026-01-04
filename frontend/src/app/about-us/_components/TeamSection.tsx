@@ -4,10 +4,10 @@ import Image from "next/image";
 
 export default function TeamSection() {
   const team = [
-    { name: "Irani Lutfiani Putri", role: "Project Manager & UI/UX Designer", img: "https://infokalteng.co/foto_berita/135642-dbb76965-0732-4b1b-bbe2-cbea751844c6.jpeg" },
-    { name: "Safril Rendiantoro", role: "Project Manager & UI/UX Designer", img: "https://media.istockphoto.com/id/824860820/id/foto/kera-barbary.jpg?s=1024x1024&w=is&k=20&c=fljqHlJ9ZJKsGTFWQ_Z6JX6uSCuK3btHw9LDJNvasdk=" },
-    { name: "Agung Cahyandi", role: "Frontend Developer", img: "https://akcdn.detik.net.id/community/media/visual/2017/12/06/6414c1ae-fcd1-49a6-8316-4a71c29f93ff_43.jpg?w=700&q=90" },
-    { name: "Athallah Dzaki Anggoro Seputro", role: "Backend Developer", img: "https://i.pinimg.com/736x/51/81/50/5181504867608b81c9f5b848eb2c967e.jpg" },
+    { name: "Irani Lutfiani Putri", role: "Project Manager & UI/UX Designer", img: "/images/rani.jpg" },
+    { name: "Safril Rendiantoro", role: "UI/UX Designer", img: "/images/rendi.jpg" },
+    { name: "Agung Cahyandi", role: "Frontend Developer", img: "/images/agung.jpg" },
+    { name: "Athallah Dzaki Anggoro Seputro", role: "Backend Developer", img: "/images/atha.jpg" },
   ];
 
   return (
@@ -25,6 +25,7 @@ export default function TeamSection() {
               alt={person.name}
               width={128}
               height={0}
+              unoptimized={true}
               className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 mx-auto rounded-full object-cover mb-3 sm:mb-4 shadow-md"
             />
             <h3 className="text-base sm:text-lg md:text-xl font-bold px-2">{person.name}</h3>
