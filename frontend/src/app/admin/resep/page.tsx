@@ -49,7 +49,7 @@ export default function ResepManagementPage() {
       ]);
       
       if (resepResponse.success && resepResponse.data) {
-        setReseps(resepResponse.data.data);
+        setReseps(resepResponse.data as any || []);
       }
       
       if (kategoriResponse.success && kategoriResponse.data) {
