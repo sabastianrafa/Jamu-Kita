@@ -6,7 +6,7 @@ Platform digital untuk melestarikan dan berbagi warisan resep jamu tradisional I
 ![Typescript](https://img.shields.io/badge/TypeScript-61.3%25-blue)
 ![JavaScript](https://img.shields.io/badge/JavaScript-36.9%25-yellow)
 ![Tests](https://github.com/AthallahDzaki/Jamu-Kita/actions/workflows/backendTest.yaml/badge.svg)
-![Node Version](https://img.shields.io/badge/node-%3E%3D18.0.%200-brightgreen)
+![Node Version](https://img.shields.io/badge/node-%3E%3D18.0.%200-brightgreen)aaa
 
 ## 📖 Tentang Project
 
