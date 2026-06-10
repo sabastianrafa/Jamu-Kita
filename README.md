@@ -1,6 +1,6 @@
 # Jamu-Kita 🌿
 
-Platform digital untuk melestarikan dan berbagi warisan resep jamu tradisional Indonesia. 
+Platform digital untuk melestarikan dan berbagi warisan resep jamu tradisional Indonesia. aaa
 
 [![Live_Demo](https://img.shields.io/badge/demo-live-success)](https://jamu-kita.vercel.app)
 ![Typescript](https://img.shields.io/badge/TypeScript-61.3%25-blue)
